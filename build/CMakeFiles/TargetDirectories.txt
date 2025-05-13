@@ -1,0 +1,10 @@
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/CMakeFiles/INSTALL.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/flutter/CMakeFiles/flutter_wrapper_plugin.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/flutter/CMakeFiles/flutter_wrapper_app.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/flutter/CMakeFiles/flutter_assemble.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/flutter/CMakeFiles/INSTALL.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/runner/CMakeFiles/servicios_de_modelaje3d.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/runner/CMakeFiles/INSTALL.dir
+C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/runner/CMakeFiles/ALL_BUILD.dir
