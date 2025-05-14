@@ -1,20 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:servicios_de_modelaje3d/pages/profile.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  static const appTitle = 'Drawer Demo';
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: appTitle,
-      home: MyHomePage(title: appTitle),
-    );
-  }
-}
+import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
+import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -28,11 +15,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   String _selectedCategory = 'Todos';
 
-  static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
-    fontWeight: FontWeight.bold,
-  );
-
+  final PageController _pageController = PageController(viewportFraction: 0.7);
+  double _currentPage = 0;
   final List<String> categories = [
     'Todos',
     'Medieval',
@@ -49,85 +33,50 @@ class _MyHomePageState extends State<MyHomePage> {
     'Simulación',
   ];
 
-  final List<_PlanData> plans = [
-    _PlanData(
+  final List<PlanData> plans = [
+    PlanData(
       category: 'Medieval',
       title: 'Medieval',
       imagePath: 'assets/images/Medieval.png',
       description: 'Para mundos medievales',
     ),
+    PlanData(
+      category: 'Shooter',
+      title: 'Shooter',
+      imagePath: 'assets/images/Medieval.png',
+      description: 'Ideal para shooters llenos de acción',
+    ),
+    PlanData(
+      category: 'Aventura',
+      title: 'Aventura',
+      imagePath: 'assets/images/Medieval.png',
+      description: 'Perfecto para aventuras épicas',
+    ),
   ];
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      setState(() {
+        _currentPage = _pageController.page ?? 0;
+      });
+    });
+  }
 
-  List<_PlanData> get filteredPlans {
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  List<PlanData> get filteredPlans {
     if (_selectedCategory == 'Todos') return plans;
     return plans.where((plan) => plan.category == _selectedCategory).toList();
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _onCategorySelected(String category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-  }
-
-  List<Widget> get _widgetOptions => <Widget>[
-    SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              'Categorías',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    categories.map((cat) {
-                      final isSelected = _selectedCategory == cat;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                isSelected
-                                    ? Colors.deepPurple
-                                    : Colors.grey.shade300,
-                            foregroundColor:
-                                isSelected ? Colors.white : Colors.black,
-                          ),
-                          onPressed: () => _onCategorySelected(cat),
-                          child: Text(cat),
-                        ),
-                      );
-                    }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          ...filteredPlans.map(
-            (plan) => _PlanCard(
-              title: plan.title,
-              imagePath: plan.imagePath,
-              description: plan.description,
-            ),
-          ),
-        ],
-      ),
-    ),
-    Text('Index 1: Profile', style: optionStyle),
-    Text('Index 2: School', style: optionStyle),
-  ];
+  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
+  void _onCategorySelected(String category) =>
+      setState(() => _selectedCategory = category);
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +92,20 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
         ),
       ),
-      body: Center(child: _widgetOptions[_selectedIndex]),
+      body: Center(
+        child:
+            _selectedIndex == 0
+                ? _buildHomeContent()
+                : _selectedIndex == 1
+                ? const Text(
+                  'Index 1: Profile',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                )
+                : const Text(
+                  'Index 2: School',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -185,98 +147,70 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
 
-class _PlanCard extends StatelessWidget {
-  final String title;
-  final String imagePath;
-  final String description;
-
-  const _PlanCard({
-    required this.title,
-    required this.imagePath,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-      child: Card(
-        color: Colors.grey[200],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-              child: Image.asset(imagePath),
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              'Categorías',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children:
+                    categories.map((cat) {
+                      final isSelected = _selectedCategory == cat;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                isSelected
+                                    ? Colors.deepPurple
+                                    : Colors.grey.shade300,
+                            foregroundColor:
+                                isSelected ? Colors.white : Colors.black,
+                          ),
+                          onPressed: () => _onCategorySelected(cat),
+                          child: Text(cat),
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 370,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: filteredPlans.length,
+              itemBuilder: (context, index) {
+                final scale = index == _currentPage.round() ? 1.0 : 0.9;
+                final offset = index == _currentPage.round() ? 0.0 : 20.0;
+                return Transform.translate(
+                  offset: Offset(0, offset),
+                  child: Transform.scale(
+                    scale: scale,
+                    child: PlanCard(
+                      title: filteredPlans[index].title,
+                      imagePath: filteredPlans[index].imagePath,
+                      description: filteredPlans[index].description,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 20),
-                      Text(' 4.3', style: TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(description, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '\$25',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      FloatingActionButton(
-                        mini: true,
-                        onPressed: () {
-                          // Acción al agregar al carrito
-                        },
-                        backgroundColor: Colors.deepPurple,
-                        child: const Icon(Icons.add_shopping_cart),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-}
-
-class _PlanData {
-  final String category;
-  final String title;
-  final String imagePath;
-  final String description;
-
-  _PlanData({
-    required this.category,
-    required this.title,
-    required this.imagePath,
-    required this.description,
-  });
 }
