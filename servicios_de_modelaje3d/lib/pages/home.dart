@@ -188,13 +188,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           SizedBox(
-            height: 370,
+            height: 400,
             child: PageView.builder(
               controller: _pageController,
               itemCount: filteredPlans.length,
               itemBuilder: (context, index) {
-                final scale = index == _currentPage.round() ? 1.0 : 0.9;
-                final offset = index == _currentPage.round() ? 0.0 : 20.0;
+                final difference = (_currentPage - index).abs();
+                final scale = (1 - difference * 0.1).clamp(0.9, 1.0);
+                final offset = (difference * 20).clamp(0.0, 40.0);
+
                 return Transform.translate(
                   offset: Offset(0, offset),
                   child: Transform.scale(
