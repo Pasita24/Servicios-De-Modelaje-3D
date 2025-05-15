@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA78976),
+      backgroundColor: const Color(0xFF240046),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
             ScaleTransition(
               scale: _scaleAnimation,
               child: Image.asset(
-                'assets/images/Medieval.png',
+                'assets/images/Logo.png',
                 width: 150,
                 height: 150,
               ),

@@ -63,6 +63,9 @@ flutter:
       - assets/images/Medevial.jpg
       - assets/images/Medieval.png
       - assets/images/Shooter.jpg
+      - assets/images/Shooter.png
+      - assets/images/Logo.png
+      - assets/images/Adventura.png
     
 flutter_native_splash:
     color: "#FFFFFF"

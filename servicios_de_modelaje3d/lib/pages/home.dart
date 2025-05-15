@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
 import 'package:servicios_de_modelaje3d/models/plan_data.dart';
+import 'package:servicios_de_modelaje3d/widgets/favorite_plan_card.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -13,6 +14,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   String _selectedCategory = 'Todos';
+  final List<String> pageTitles = ['Inicio', 'Favoritos', 'Categorías'];
 
   final PageController _pageController = PageController(viewportFraction: 0.7);
   double _currentPage = 0;
@@ -43,13 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
     PlanData(
       category: 'Shooter',
       title: 'Shooter',
-      imagePath: 'assets/images/Medieval.png',
+      imagePath: 'assets/images/Shooter.png',
       description: 'Ideal para shooters llenos de acción',
     ),
     PlanData(
       category: 'Aventura',
       title: 'Aventura',
-      imagePath: 'assets/images/Medieval.png',
+      imagePath: 'assets/images/Adventura.png',
       description: 'Perfecto para aventuras épicas',
     ),
   ];
@@ -100,15 +102,17 @@ class _MyHomePageState extends State<MyHomePage> {
       _buildCategories(),
     ];
 
+    final List<String> pageTitles = ['Inicio', 'Favoritos', 'Categorías'];
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFA78976),
-        title: Text(widget.title),
+        backgroundColor: const Color(0xFFF600DD),
+        title: Text(pageTitles[_selectedIndex]),
       ),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFA78976),
+        selectedItemColor: const Color(0xFFF600DD),
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
@@ -151,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 isSelected
-                                    ? const Color(0xFFA78976)
+                                    ? const Color(0xFFF600DD)
                                     : Colors.grey.shade300,
                             foregroundColor:
                                 isSelected ? Colors.white : Colors.black,
@@ -208,17 +212,20 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: _favorites.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           childAspectRatio: 0.75,
         ),
         itemBuilder: (context, index) {
           final plan = _favorites[index];
-          return PlanCard(
+          return FavoritePlanCard(
             title: plan.title,
             imagePath: plan.imagePath,
-            description: plan.description,
-            onAddFavorite: () {}, // no hace nada aquí
+            onBuy: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Agregado al carrito: ${plan.title}')),
+              );
+            },
           );
         },
       ),
