@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:servicios_de_modelaje3d/pages/profile.dart';
 import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
 import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 
@@ -17,6 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final PageController _pageController = PageController(viewportFraction: 0.7);
   double _currentPage = 0;
+
   final List<String> categories = [
     'Todos',
     'Medieval',
@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
       description: 'Perfecto para aventuras épicas',
     ),
   ];
+
   @override
   void initState() {
     super.initState();
@@ -69,81 +70,57 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  final List<PlanData> _favorites = [];
+  void _addToFavorites(PlanData plan) {
+    if (!_favorites.contains(plan)) {
+      setState(() {
+        _favorites.add(plan);
+      });
+    }
+  }
+
+  void _onCategorySelected(String category) {
+    setState(() => _selectedCategory = category);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
   List<PlanData> get filteredPlans {
     if (_selectedCategory == 'Todos') return plans;
     return plans.where((plan) => plan.category == _selectedCategory).toList();
   }
 
-  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
-  void _onCategorySelected(String category) =>
-      setState(() => _selectedCategory = category);
-
   @override
   Widget build(BuildContext context) {
+    List<Widget> pages = [
+      _buildHomeContent(),
+      _buildFavorites(),
+      _buildCategories(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: const Color(0xFFA78976),
         title: Text(widget.title),
-        leading: Builder(
-          builder:
-              (context) => IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
-        ),
       ),
-      body: Center(
-        child:
-            _selectedIndex == 0
-                ? _buildHomeContent()
-                : _selectedIndex == 1
-                ? const Text(
-                  'Index 1: Profile',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                )
-                : const Text(
-                  'Index 2: School',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Drawer Header'),
-            ),
-            ListTile(
-              title: const Text('Home'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Profile'),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyprofilePage(title: 'Profile'),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('School'),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                _onItemTapped(2);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
+      body: pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFFA78976),
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favoritos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.category),
+            label: 'Categorías',
+          ),
+        ],
       ),
     );
   }
@@ -174,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 isSelected
-                                    ? Colors.deepPurple
+                                    ? const Color(0xFFA78976)
                                     : Colors.grey.shade300,
                             foregroundColor:
                                 isSelected ? Colors.white : Colors.black,
@@ -205,6 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: filteredPlans[index].title,
                       imagePath: filteredPlans[index].imagePath,
                       description: filteredPlans[index].description,
+                      onAddFavorite:
+                          () => _addToFavorites(filteredPlans[index]),
                     ),
                   ),
                 );
@@ -213,6 +192,56 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFavorites() {
+    if (_favorites.isEmpty) {
+      return const Center(
+        child: Text('Aún no hay favoritos', style: TextStyle(fontSize: 18)),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.builder(
+        itemCount: _favorites.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.75,
+        ),
+        itemBuilder: (context, index) {
+          final plan = _favorites[index];
+          return PlanCard(
+            title: plan.title,
+            imagePath: plan.imagePath,
+            description: plan.description,
+            onAddFavorite: () {}, // no hace nada aquí
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategories() {
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children:
+          categories.map((cat) {
+            return Card(
+              child: ListTile(
+                title: Text(cat),
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = 0;
+                    _selectedCategory = cat;
+                  });
+                },
+              ),
+            );
+          }).toList(),
     );
   }
 }

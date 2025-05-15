@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
+// plan_card.dart
 class PlanCard extends StatelessWidget {
   final String title;
   final String imagePath;
   final String description;
+  final VoidCallback onAddFavorite; // <-- nuevo parámetro
 
   const PlanCard({
     super.key,
     required this.title,
     required this.imagePath,
     required this.description,
+    required this.onAddFavorite, // <-- en el constructor
   });
 
   @override
@@ -22,14 +25,14 @@ class PlanCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               gradient: const RadialGradient(
-                colors: [Colors.grey, Colors.blueGrey],
+                colors: [Color(0xFFA78976), Color(0xFF7D5244)],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
                   blurRadius: 6,
-                  offset: const Offset(0, 3),
+                  offset: const Offset(0, 01),
                 ),
               ],
             ),
@@ -48,17 +51,30 @@ class PlanCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFFd3d3d3),
                     ),
                   ),
                   const SizedBox(height: 6),
                   const Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 20),
-                      Text(' 4.3', style: TextStyle(fontSize: 14)),
+                      Text(
+                        ' 4.3',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFFd3d3d3),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(description, style: const TextStyle(fontSize: 14)),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFd3d3d3),
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,13 +84,15 @@ class PlanCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFFd3d3d3),
                         ),
                       ),
                       FloatingActionButton(
                         mini: true,
-                        onPressed: () {},
-                        backgroundColor: Colors.deepPurple,
-                        child: const Icon(Icons.add_shopping_cart),
+                        onPressed: onAddFavorite, // <-- se llama aquí
+                        backgroundColor: const Color(0xFFd3d3d3),
+                        foregroundColor: const Color(0xFFA78976),
+                        child: const Icon(Icons.add),
                       ),
                     ],
                   ),
