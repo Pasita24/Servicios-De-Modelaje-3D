@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "runner/Profile/servicios_de_modelaje3d.exe"
+			"path" : "runner/Release/servicios_de_modelaje3d.exe"
 		},
 		{
-			"path" : "runner/Profile/servicios_de_modelaje3d.pdb"
+			"path" : "runner/Release/servicios_de_modelaje3d.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -318,12 +318,12 @@
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 4,
-			"id" : "flutter_wrapper_app::@2bb09fbb03a373b2cb34"
-		},
-		{
 			"backtrace" : 6,
 			"id" : "flutter_assemble::@2bb09fbb03a373b2cb34"
+		},
+		{
+			"backtrace" : 4,
+			"id" : "flutter_wrapper_app::@2bb09fbb03a373b2cb34"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
@@ -336,7 +336,7 @@
 		[
 			{
 				"backtrace" : 3,
-				"path" : "C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/runner/Profile"
+				"path" : "C:/Users/benja/Documents/Servicios-De-Modelaje-3D/build/runner/Release"
 			}
 		],
 		"prefix" : 
@@ -358,7 +358,7 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "..\\flutter\\Profile\\flutter_wrapper_app.lib",
+				"fragment" : "..\\flutter\\Release\\flutter_wrapper_app.lib",
 				"role" : "libraries"
 			},
 			{
