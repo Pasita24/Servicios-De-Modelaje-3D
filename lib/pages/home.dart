@@ -105,8 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<String> pageTitles = ['Inicio', 'Favoritos', 'Categorías'];
 
     return Scaffold(
+      backgroundColor: const Color(0xFF3A3C3D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF600DD),
+        backgroundColor: const Color(0xFF3A3C3D),
         title: Text(pageTitles[_selectedIndex]),
       ),
       body: pages[_selectedIndex],
@@ -188,6 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       description: filteredPlans[index].description,
                       onAddFavorite:
                           () => _addToFavorites(filteredPlans[index]),
+                      index: index, // Pasar el índice
                     ),
                   ),
                 );

@@ -80,6 +80,7 @@ class _MyprofileState extends State<MyprofilePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
+        heroTag: 'fab_profile',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

@@ -7,6 +7,7 @@ class PlanCard extends StatelessWidget {
   final String imagePath;
   final String description;
   final VoidCallback onAddFavorite;
+  final int index; // Nuevo parámetro
 
   const PlanCard({
     super.key,
@@ -14,6 +15,7 @@ class PlanCard extends StatelessWidget {
     required this.imagePath,
     required this.description,
     required this.onAddFavorite,
+    required this.index, // Agregar índice
   });
 
   @override
@@ -104,6 +106,7 @@ class PlanCard extends StatelessWidget {
                         ),
                         FloatingActionButton(
                           mini: true,
+                          heroTag: 'fab_${title}_$index', // Etiqueta única
                           onPressed: onAddFavorite,
                           backgroundColor: const Color(0xFFd3d3d3),
                           foregroundColor: const Color(0xFFF600DD),
