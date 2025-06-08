@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
 import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 import 'package:servicios_de_modelaje3d/widgets/favorite_plan_card.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -135,6 +136,18 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(
+            height: 300, // Ajusta la altura como quieras
+            child: ModelViewer(
+              src: 'assets/camaraman.glb',
+              alt: 'Modelo 3D de camaraman',
+              ar: true,
+              autoRotate: true,
+              cameraControls: true,
+              backgroundColor: Colors.white,
+            ),
+          ),
+
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -142,6 +155,8 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
+
+          // Resto de tu código para categorías y planes...
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SingleChildScrollView(
@@ -169,6 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+
           SizedBox(
             height: 400,
             child: PageView.builder(
@@ -189,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       description: filteredPlans[index].description,
                       onAddFavorite:
                           () => _addToFavorites(filteredPlans[index]),
-                      index: index, // Pasar el índice
+                      index: index,
                     ),
                   ),
                 );
