@@ -11,6 +11,7 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB('plans.db');
+    await _fixInvalidImagePaths(); // Llamar al método de corrección
     return _database!;
   }
 
@@ -30,6 +31,16 @@ class DatabaseHelper {
         description TEXT
       )
     ''');
+  }
+
+  Future<void> _fixInvalidImagePaths() async {
+    final db = await database;
+    await db.update(
+      'plans',
+      {'imagePath': 'assets/images/Medieval.png'},
+      where: 'imagePath = ?',
+      whereArgs: ['assets/images/default.png'],
+    );
   }
 
   Future<int> createPlan(PlanData plan) async {

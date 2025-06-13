@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
 import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 import 'package:servicios_de_modelaje3d/widgets/favorite_plan_card.dart';
+import 'package:servicios_de_modelaje3d/pages/plan_form_page.dart';
+import 'package:servicios_de_modelaje3d/services/plan_provider.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -36,27 +39,6 @@ class _MyHomePageState extends State<MyHomePage> {
     'Simulación',
   ];
 
-  final List<PlanData> plans = [
-    PlanData(
-      category: 'Medieval',
-      title: 'Medieval',
-      imagePath: 'assets/images/Medieval.png',
-      description: 'Para mundos medievales',
-    ),
-    PlanData(
-      category: 'Shooter',
-      title: 'Shooter',
-      imagePath: 'assets/images/Shooter.png',
-      description: 'Ideal para shooters llenos de acción',
-    ),
-    PlanData(
-      category: 'Aventura',
-      title: 'Aventura',
-      imagePath: 'assets/images/Adventura.png',
-      description: 'Perfecto para aventuras épicas',
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -73,15 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  final List<PlanData> _favorites = [];
-  void _addToFavorites(PlanData plan) {
-    if (!_favorites.contains(plan)) {
-      setState(() {
-        _favorites.add(plan);
-      });
-    }
-  }
-
   void _onCategorySelected(String category) {
     setState(() => _selectedCategory = category);
   }
@@ -90,52 +63,67 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() => _selectedIndex = index);
   }
 
-  List<PlanData> get filteredPlans {
+  List<PlanData> getFilteredPlans(List<PlanData> plans) {
     if (_selectedCategory == 'Todos') return plans;
     return plans.where((plan) => plan.category == _selectedCategory).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [
-      _buildHomeContent(),
-      _buildFavorites(),
-      _buildCategories(),
-    ];
-
-    final List<String> pageTitles = ['Inicio', 'Favoritos', 'Categorías'];
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF3A3C3D),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3A3C3D),
-        title: Text(pageTitles[_selectedIndex]),
-      ),
-      body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFF600DD),
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favoritos',
+    return Consumer<PlanProvider>(
+      builder: (context, planProvider, child) {
+        final filteredPlans = getFilteredPlans(planProvider.plans);
+        return Scaffold(
+          backgroundColor: const Color(0xFF3A3C3D),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF3A3C3D),
+            title: Text(pageTitles[_selectedIndex]),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PlanFormPage()),
+                  );
+                },
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categorías',
+          body:
+              [
+                _buildHomeContent(filteredPlans, planProvider),
+                _buildFavorites(planProvider),
+                _buildCategories(),
+              ][_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            selectedItemColor: const Color(0xFFF600DD),
+            onTap: _onItemTapped,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite),
+                label: 'Favoritos',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.category),
+                label: 'Categorías',
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildHomeContent() {
+  Widget _buildHomeContent(
+    List<PlanData> filteredPlans,
+    PlanProvider planProvider,
+  ) {
     return SingleChildScrollView(
       child: Stack(
         children: [
-          // Fondo JPG
           Container(
             height: 600,
             decoration: const BoxDecoration(
@@ -148,8 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Column(
             children: [
               const SizedBox(height: 30),
-
-              // Modelo 3D encima del fondo
               SizedBox(
                 height: 300,
                 child: ModelViewer(
@@ -161,10 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   backgroundColor: Colors.transparent,
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // Título y descripción
               const Text(
                 'Modelos 3D',
                 style: TextStyle(
@@ -179,13 +162,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(fontSize: 16, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
-
               const SizedBox(height: 15),
-
-              // Botón Cotizar
               ElevatedButton(
                 onPressed: () {
-                  // Aquí puedes abrir una nueva pantalla o formulario
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Cotización iniciada')),
                   );
@@ -195,10 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: const Text('Cotizar'),
               ),
-
               const SizedBox(height: 20),
-
-              // Continúa con categorías y cards como antes
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -210,7 +186,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: SingleChildScrollView(
@@ -238,35 +213,45 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               SizedBox(
                 height: 400,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: filteredPlans.length,
-                  itemBuilder: (context, index) {
-                    final difference = (_currentPage - index).abs();
-                    final scale = (1 - difference * 0.1).clamp(0.9, 1.0);
-                    final offset = (difference * 20).clamp(0.0, 40.0);
-
-                    return Transform.translate(
-                      offset: Offset(0, offset),
-                      child: Transform.scale(
-                        scale: scale,
-                        child: PlanCard(
-                          title: filteredPlans[index].title,
-                          imagePath: filteredPlans[index].imagePath,
-                          description: filteredPlans[index].description,
-                          onAddFavorite:
-                              () => _addToFavorites(filteredPlans[index]),
-                          index: index,
+                child:
+                    filteredPlans.isEmpty
+                        ? const Center(
+                          child: Text(
+                            'No hay modelos disponibles',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                        : PageView.builder(
+                          controller: _pageController,
+                          itemCount: filteredPlans.length,
+                          itemBuilder: (context, index) {
+                            final difference = (_currentPage - index).abs();
+                            final scale = (1 - difference * 0.1).clamp(
+                              0.9,
+                              1.0,
+                            );
+                            final offset = (difference * 20).clamp(0.0, 40.0);
+                            return Transform.translate(
+                              offset: Offset(0, offset),
+                              child: Transform.scale(
+                                scale: scale,
+                                child: PlanCard(
+                                  title: filteredPlans[index].title,
+                                  imagePath: filteredPlans[index].imagePath,
+                                  description: filteredPlans[index].description,
+                                  onAddFavorite:
+                                      () => planProvider.addToFavorites(
+                                        filteredPlans[index],
+                                      ),
+                                  index: index,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
@@ -275,17 +260,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildFavorites() {
-    if (_favorites.isEmpty) {
+  Widget _buildFavorites(PlanProvider planProvider) {
+    if (planProvider.favorites.isEmpty) {
       return const Center(
-        child: Text('Aún no hay favoritos', style: TextStyle(fontSize: 18)),
+        child: Text(
+          'Aún no hay favoritos',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
       );
     }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GridView.builder(
-        itemCount: _favorites.length,
+        itemCount: planProvider.favorites.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 12,
@@ -293,7 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {
           childAspectRatio: 0.75,
         ),
         itemBuilder: (context, index) {
-          final plan = _favorites[index];
+          final plan = planProvider.favorites[index];
           return FavoritePlanCard(
             title: plan.title,
             imagePath: plan.imagePath,
