@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.servicios_de_modelaje3d"
+    namespace = "cl.pasitaservices.ize"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.servicios_de_modelaje3d"
+        applicationId = "cl.pasitaservices.ize"
         minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

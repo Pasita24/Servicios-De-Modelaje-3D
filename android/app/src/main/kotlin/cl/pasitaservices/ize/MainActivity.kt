@@ -1,4 +1,4 @@
-package com.example.servicios_de_modelaje3d
+package cl.pasitaservices.ize
 
 import io.flutter.embedding.android.FlutterActivity
 
