@@ -112,6 +112,20 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
+          floatingActionButton:
+              _selectedIndex == 2
+                  ? FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PlanFormPage()),
+                      );
+                    },
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    child: const Icon(Icons.add),
+                  )
+                  : null,
         );
       },
     );
