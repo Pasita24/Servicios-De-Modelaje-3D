@@ -1,5 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-
 import 'package:path/path.dart';
 import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 
@@ -23,14 +22,14 @@ class DatabaseHelper {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-           CREATE TABLE plans (
-             id INTEGER PRIMARY KEY AUTOINCREMENT,
-             category TEXT,
-             title TEXT,
-             imagePath TEXT,
-             description TEXT
-           )
-         ''');
+      CREATE TABLE plans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT,
+        title TEXT,
+        imagePath TEXT,
+        description TEXT
+      )
+    ''');
   }
 
   Future<int> createPlan(PlanData plan) async {
