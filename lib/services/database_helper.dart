@@ -23,7 +23,7 @@ class DatabaseHelper {
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 2, // Incrementar versión
+      version: 3, // Incrementar versión por nuevos campos
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -31,41 +31,100 @@ class DatabaseHelper {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-         CREATE TABLE plans (
-           id INTEGER PRIMARY KEY AUTOINCREMENT,
-           category TEXT,
-           title TEXT,
-           imagePath TEXT,
-           description TEXT
-         )
-       ''');
+      CREATE TABLE plans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT,
+        title TEXT,
+        imagePath TEXT,
+        description TEXT,
+        weapon TEXT,
+        role TEXT
+      )
+    ''');
     await db.execute('''
-         CREATE TABLE users (
-           id INTEGER PRIMARY KEY AUTOINCREMENT,
-           email TEXT UNIQUE,
-           password TEXT
-         )
-       ''');
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE,
+        password TEXT
+      )
+    ''');
     // Insertar usuario de prueba
     await db.insert('users', {
       'email': 'test@modelaje3d.com',
       'password': _hashPassword('password123'),
+    });
+    // Insertar personajes predefinidos
+    await db.insert('plans', {
+      'category': 'Medieval',
+      'title': 'Caballero Valiente',
+      'imagePath': 'assets/images/Medieval.png',
+      'description':
+          'Un guerrero con armadura pesada, ideal para combates cuerpo a cuerpo.',
+      'weapon': 'Espada Larga',
+      'role': 'Guerrero',
+    });
+    await db.insert('plans', {
+      'category': 'Shooter',
+      'title': 'Francotirador Élite',
+      'imagePath': 'assets/images/Shooter.png',
+      'description': 'Un experto en combate a distancia con precisión letal.',
+      'weapon': 'Rifle de Francotirador',
+      'role': 'Tirador',
+    });
+    await db.insert('plans', {
+      'category': 'Aventura',
+      'title': 'Explorador Místico',
+      'imagePath': 'assets/images/Adventura.png',
+      'description':
+          'Un aventurero que combina magia y habilidades de exploración.',
+      'weapon': 'Báculo Encantado',
+      'role': 'Mago',
     });
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('''
-           CREATE TABLE users (
-             id INTEGER PRIMARY KEY AUTOINCREMENT,
-             email TEXT UNIQUE,
-             password TEXT
-           )
-         ''');
-      // Insertar usuario de prueba
+        CREATE TABLE users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT UNIQUE,
+          password TEXT
+        )
+      ''');
       await db.insert('users', {
         'email': 'test@modelaje3d.com',
         'password': _hashPassword('password123'),
+      });
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE plans ADD COLUMN weapon TEXT');
+      await db.execute('ALTER TABLE plans ADD COLUMN role TEXT');
+      // Insertar personajes predefinidos
+      await db.insert('plans', {
+        'category': 'Medieval',
+        'title': 'Caballero Valiente',
+        'imagePath': 'assets/images/Medieval.png',
+        'description':
+            'Un guerrero con armadura pesada, ideal para combates cuerpo a cuerpo.',
+        'weapon': 'Espada Larga',
+        'role': 'Guerrero',
+      });
+      await db.insert('plans', {
+        'category': 'Shooter',
+        'title': 'Francotirador Élite',
+        'imagePath': 'assets/images/Shooter.png',
+        'description': 'Un experto en combate a distancia con precisión letal.',
+        'weapon': 'Rifle de Francotirador',
+        'role': 'Tirador',
+      });
+      await db.insert('plans', {
+        'category': 'Aventura',
+        'title': 'Explorador Místico',
+        'imagePath': 'assets/images/Adventura.png',
+        'description':
+            'Un aventurero que combina magia y habilidades de exploración.',
+        'weapon': 'Báculo Encantado',
+        'role': 'Mago',
       });
     }
   }

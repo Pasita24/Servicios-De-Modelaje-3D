@@ -3,31 +3,13 @@ import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 import 'package:servicios_de_modelaje3d/pages/plan_detail_page.dart';
 
 class FavoritePlanCard extends StatelessWidget {
-  final String title;
-  final String imagePath;
-  final String reviews;
-  final String price;
+  final PlanData plan;
   final VoidCallback onBuy;
 
-  const FavoritePlanCard({
-    super.key,
-    required this.title,
-    required this.imagePath,
-    this.reviews = '123 Reviews',
-    this.price = '\$25',
-    required this.onBuy,
-  });
+  const FavoritePlanCard({super.key, required this.plan, required this.onBuy});
 
   @override
   Widget build(BuildContext context) {
-    final plan = PlanData(
-      title: title,
-      imagePath: imagePath,
-      description:
-          'Este servicio incluye personajes modelados en estilo $title en 3D.',
-      category: title,
-    );
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -39,7 +21,9 @@ class FavoritePlanCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
-            Positioned.fill(child: Image.asset(imagePath, fit: BoxFit.cover)),
+            Positioned.fill(
+              child: Image.asset(plan.imagePath, fit: BoxFit.cover),
+            ),
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -61,7 +45,7 @@ class FavoritePlanCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    plan.title,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -74,7 +58,7 @@ class FavoritePlanCard extends StatelessWidget {
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
                       Text(
-                        reviews,
+                        '123 Reviews',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -95,9 +79,9 @@ class FavoritePlanCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          price,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        const Text(
+                          '\$25',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 8),
                         GestureDetector(

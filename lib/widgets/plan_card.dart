@@ -6,16 +6,20 @@ class PlanCard extends StatelessWidget {
   final String title;
   final String imagePath;
   final String description;
+  final String weapon;
+  final String role;
   final VoidCallback onAddFavorite;
-  final int index; // Nuevo parámetro
+  final int index;
 
   const PlanCard({
     super.key,
     required this.title,
     required this.imagePath,
     required this.description,
+    required this.weapon,
+    required this.role,
     required this.onAddFavorite,
-    required this.index, // Agregar índice
+    required this.index,
   });
 
   @override
@@ -25,6 +29,8 @@ class PlanCard extends StatelessWidget {
       imagePath: imagePath,
       description: description,
       category: title,
+      weapon: weapon,
+      role: role,
     );
 
     return GestureDetector(
@@ -35,11 +41,12 @@ class PlanCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 30.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Container(
+              constraints: BoxConstraints(minHeight: 320),
               decoration: BoxDecoration(
                 gradient: const RadialGradient(
                   colors: [Color(0xFF3c096c), Color(0xFF240046)],
@@ -58,10 +65,11 @@ class PlanCard extends StatelessWidget {
                   top: 100,
                   left: 20,
                   right: 15,
-                  bottom: 12,
+                  bottom: 20,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       title,
@@ -70,6 +78,8 @@ class PlanCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFd3d3d3),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     const Row(
@@ -91,6 +101,8 @@ class PlanCard extends StatelessWidget {
                         fontSize: 14,
                         color: Color(0xFFd3d3d3),
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -106,7 +118,7 @@ class PlanCard extends StatelessWidget {
                         ),
                         FloatingActionButton(
                           mini: true,
-                          heroTag: 'fab_${title}_$index', // Etiqueta única
+                          heroTag: 'fab_${title}_$index',
                           onPressed: onAddFavorite,
                           backgroundColor: const Color(0xFFd3d3d3),
                           foregroundColor: const Color(0xFFF600DD),
@@ -137,7 +149,14 @@ class PlanCard extends StatelessWidget {
                     ],
                   ),
                   child: ClipOval(
-                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                    child:
+                        imagePath.isNotEmpty
+                            ? Image.asset(imagePath, fit: BoxFit.cover)
+                            : const Icon(
+                              Icons.image,
+                              size: 100,
+                              color: Colors.grey,
+                            ),
                   ),
                 ),
               ),

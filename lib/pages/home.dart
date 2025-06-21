@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:servicios_de_modelaje3d/widgets/plan_card.dart';
-import 'package:servicios_de_modelaje3d/models/plan_data.dart';
 import 'package:servicios_de_modelaje3d/widgets/favorite_plan_card.dart';
 import 'package:servicios_de_modelaje3d/pages/plan_form_page.dart';
 import 'package:servicios_de_modelaje3d/services/plan_provider.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
+import 'dart:async';
+import 'package:servicios_de_modelaje3d/pages/character_builder_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -17,124 +18,109 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  String _selectedCategory = 'Todos';
-  final List<String> pageTitles = ['Inicio', 'Favoritos', 'Categorías'];
+  // Actualizar la lista de títulos de página
+  final List<String> pageTitles = ['Inicio', 'Favoritos', 'Arma tu personaje'];
+  Timer? _carouselTimer;
 
-  final PageController _pageController = PageController(viewportFraction: 0.7);
-  double _currentPage = 0;
-
-  final List<String> categories = [
-    'Todos',
-    'Medieval',
-    'Shooter',
-    'Aventura',
-    'Carreras',
-    'Terror',
-    'Fantasía',
-    'Futurista',
-    'Puzzle',
-    'Deportes',
-    'RPG',
-    'Plataformas',
-    'Simulación',
+  // Modelos destacados (puedes reemplazar con datos reales)
+  final List<Map<String, dynamic>> featuredModels = [
+    {
+      'title': 'Caballero Élite',
+      'image': 'assets/images/Medieval.png',
+      'description': 'Armadura detallada con efectos de batalla',
+      'rating': 4.8,
+    },
+    {
+      'title': 'Francotirador Futurista',
+      'image': 'assets/images/Shooter.png',
+      'description': 'Diseño futurista con armas personalizables',
+      'rating': 4.7,
+    },
+    {
+      'title': 'Explorador Mágico',
+      'image': 'assets/images/Adventura.png',
+      'description': 'Personaje con habilidades mágicas y equipo de aventura',
+      'rating': 4.9,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page ?? 0;
-      });
-    });
+    // Iniciar carrusel automático
+    _startAutoCarousel();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _carouselTimer?.cancel();
     super.dispose();
   }
 
-  void _onCategorySelected(String category) {
-    setState(() => _selectedCategory = category);
+  void _startAutoCarousel() {
+    _carouselTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }
 
-  List<PlanData> getFilteredPlans(List<PlanData> plans) {
-    if (_selectedCategory == 'Todos') return plans;
-    return plans.where((plan) => plan.category == _selectedCategory).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<PlanProvider>(
-      builder: (context, planProvider, child) {
-        final filteredPlans = getFilteredPlans(planProvider.plans);
-        return Scaffold(
-          backgroundColor: const Color(0xFF3A3C3D),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF3A3C3D),
-            title: Text(pageTitles[_selectedIndex]),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PlanFormPage()),
-                  );
-                },
-              ),
-            ],
-          ),
-          body:
-              [
-                _buildHomeContent(filteredPlans, planProvider),
-                _buildFavorites(planProvider),
-                _buildCategories(),
-              ][_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            selectedItemColor: const Color(0xFFF600DD),
-            onTap: _onItemTapped,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
-                label: 'Favoritos',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.category),
-                label: 'Categorías',
-              ),
-            ],
-          ),
-          floatingActionButton:
-              _selectedIndex == 2
-                  ? FloatingActionButton(
+    final planProvider = Provider.of<PlanProvider>(context);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF3A3C3D),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF3A3C3D),
+        title: Text(pageTitles[_selectedIndex]),
+        actions:
+            _selectedIndex == 0
+                ? [
+                  IconButton(
+                    icon: const Icon(Icons.add),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const PlanFormPage()),
                       );
                     },
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: const Icon(Icons.add),
-                  )
-                  : null,
-        );
-      },
+                  ),
+                ]
+                : null,
+      ),
+      // Actualizar el body para incluir la nueva página
+      body:
+          [
+            _buildHomeContent(planProvider),
+            _buildFavorites(planProvider),
+            const CharacterBuilderPage(), // Nueva página
+          ][_selectedIndex],
+      // Actualizar el BottomNavigationBar
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFFF600DD),
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favoritos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.build),
+            label: 'Arma tu personaje',
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildHomeContent(
-    List<PlanData> filteredPlans,
-    PlanProvider planProvider,
-  ) {
+  Widget _buildHomeContent(PlanProvider planProvider) {
     return SingleChildScrollView(
       child: Stack(
         children: [
@@ -155,8 +141,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ModelViewer(
                   src: 'assets/camaraman.glb',
                   alt: 'Modelo 3D de camaraman',
-                  ar: true,
-                  autoRotate: true,
+                  ar: false,
+                  autoRotate: false,
                   cameraControls: true,
                   backgroundColor: Colors.transparent,
                 ),
@@ -192,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
-                  'Categorías',
+                  'Nuestros Modelos Destacados',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -200,77 +186,375 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children:
-                        categories.map((cat) {
-                          final isSelected = _selectedCategory == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isSelected
-                                        ? const Color(0xFFF600DD)
-                                        : Colors.grey.shade300,
-                                foregroundColor:
-                                    isSelected ? Colors.white : Colors.black,
-                              ),
-                              onPressed: () => _onCategorySelected(cat),
-                              child: Text(cat),
+              SizedBox(
+                height: 420,
+                child: Swiper(
+                  itemCount: featuredModels.length,
+                  itemBuilder: (context, index) {
+                    final model = featuredModels[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 30.0,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const RadialGradient(
+                            colors: [Color(0xFF3c096c), Color(0xFF240046)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: const Offset(0, 1),
                             ),
-                          );
-                        }).toList(),
-                  ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              child: Image.asset(
+                                model['image'],
+                                height: 160,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    model['title'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        ' ${model['rating']}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    model['description'],
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        '\$25',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      FloatingActionButton(
+                                        mini: true,
+                                        heroTag: 'fab_${model['title']}_$index',
+                                        onPressed: () {
+                                          // Acción para agregar a favoritos
+                                        },
+                                        backgroundColor: const Color(
+                                          0xFFd3d3d3,
+                                        ),
+                                        foregroundColor: const Color(
+                                          0xFFF600DD,
+                                        ),
+                                        child: const Icon(Icons.add),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  viewportFraction: 0.8,
+                  scale: 0.9,
+                  autoplay: true,
+                  autoplayDelay: 5000,
+                  duration: 800,
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 400,
-                child:
-                    filteredPlans.isEmpty
-                        ? const Center(
-                          child: Text(
-                            'No hay modelos disponibles',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
-                        : PageView.builder(
-                          controller: _pageController,
-                          itemCount: filteredPlans.length,
-                          itemBuilder: (context, index) {
-                            final difference = (_currentPage - index).abs();
-                            final scale = (1 - difference * 0.1).clamp(
-                              0.9,
-                              1.0,
-                            );
-                            final offset = (difference * 20).clamp(0.0, 40.0);
-                            return Transform.translate(
-                              offset: Offset(0, offset),
-                              child: Transform.scale(
-                                scale: scale,
-                                child: PlanCard(
-                                  title: filteredPlans[index].title,
-                                  imagePath: filteredPlans[index].imagePath,
-                                  description: filteredPlans[index].description,
-                                  onAddFavorite:
-                                      () => planProvider.addToFavorites(
-                                        filteredPlans[index],
-                                      ),
-                                  index: index,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-              ),
+              // Nueva sección: Cómo funciona nuestro servicio
+              _buildHowItWorksSection(),
+              const SizedBox(height: 40),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHowItWorksSection() {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'Cómo crear tu personaje 3D perfecto',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Tarjeta 1 - Presentación
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF3c096c), Color(0xFF240046)],
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Servicios de Modelaje 3D Profesional',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Creamos personajes únicos para juegos, animación y más. Nuestros modelos son altamente personalizables y listos para usar en cualquier motor 3D.',
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Navegar a página de about
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF600DD),
+                          minimumSize: const Size(120, 40),
+                        ),
+                        child: const Text('Conócenos'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/images/Fondo_main.jpeg',
+                    fit: BoxFit.cover,
+                    height: 200,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Tarjeta 2 - Proceso de creación (imagen a la izquierda)
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF3c096c), Color(0xFF240046)],
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(
+                    left: Radius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/images/Fondo_main.jpeg',
+                    fit: BoxFit.cover,
+                    height: 200,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Personaliza cada detalle',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Elige género, estilo (fantasía, futurista, post-apocalíptico), armas, accesorios y más. Cada opción afecta el precio final.',
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PlanFormPage(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF600DD),
+                          minimumSize: const Size(120, 40),
+                        ),
+                        child: const Text('Comenzar'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Tarjeta 3 - Resultado final
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF3c096c), Color(0xFF240046)],
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Recibe tu modelo 3D completo',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Al finalizar el proceso, recibirás una cotización por email con el precio final. Si aceptas, crearemos tu modelo con todos los detalles solicitados.',
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Formatos soportados: .fbx, .obj, .glb, .blend',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white60,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/images/Fondo_main.jpeg',
+                    fit: BoxFit.cover,
+                    height: 200,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 30),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PlanFormPage()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFF600DD),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          ),
+          child: const Text(
+            '¡Crea tu personaje ahora!',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        const SizedBox(height: 40),
+      ],
     );
   }
 
@@ -297,8 +581,7 @@ class _MyHomePageState extends State<MyHomePage> {
         itemBuilder: (context, index) {
           final plan = planProvider.favorites[index];
           return FavoritePlanCard(
-            title: plan.title,
-            imagePath: plan.imagePath,
+            plan: plan,
             onBuy: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Agregado al carrito: ${plan.title}')),
@@ -307,26 +590,6 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildCategories() {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children:
-          categories.map((cat) {
-            return Card(
-              child: ListTile(
-                title: Text(cat),
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 0;
-                    _selectedCategory = cat;
-                  });
-                },
-              ),
-            );
-          }).toList(),
     );
   }
 }

@@ -4,6 +4,8 @@ class PlanData {
   final String title;
   final String imagePath;
   final String description;
+  final String weapon;
+  final String role;
 
   PlanData({
     this.id,
@@ -11,6 +13,8 @@ class PlanData {
     required this.title,
     required this.imagePath,
     required this.description,
+    required this.weapon,
+    required this.role,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +24,8 @@ class PlanData {
       'title': title,
       'imagePath': imagePath,
       'description': description,
+      'weapon': weapon,
+      'role': role,
     };
   }
 
@@ -28,8 +34,10 @@ class PlanData {
       id: map['id'] as int?,
       category: map['category'] as String,
       title: map['title'] as String,
-      imagePath: map['imagePath'] as String,
+      imagePath: map['imagePath'] as String? ?? 'assets/images/Medieval.png',
       description: map['description'] as String,
+      weapon: map['weapon'] as String? ?? 'Desconocido',
+      role: map['role'] as String? ?? 'Desconocido',
     );
   }
 }

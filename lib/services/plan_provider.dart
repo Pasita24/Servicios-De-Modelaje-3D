@@ -9,14 +9,22 @@ class PlanProvider with ChangeNotifier {
   List<PlanData> get plans => _plans;
   List<PlanData> get favorites => _favorites;
 
+  bool _isLoading = false;
+
   PlanProvider() {
     _loadPlans();
   }
 
   Future<void> _loadPlans() async {
-    final db = DatabaseHelper.instance;
-    _plans = await db.getPlans();
-    notifyListeners();
+    if (_isLoading) return;
+    _isLoading = true;
+    try {
+      final db = DatabaseHelper.instance;
+      _plans = await db.getPlans();
+      notifyListeners();
+    } finally {
+      _isLoading = false;
+    }
   }
 
   Future<void> addPlan(PlanData plan) async {
