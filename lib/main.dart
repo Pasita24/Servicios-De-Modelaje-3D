@@ -6,8 +6,21 @@ import 'package:servicios_de_modelaje3d/services/plan_provider.dart';
 import 'package:servicios_de_modelaje3d/themes/theme.dart'; // Importa theme.dart
 import 'package:servicios_de_modelaje3d/utils/util.dart'; // Importa util.dart
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authProvider = AuthProvider();
+  await authProvider.init(); // Inicializa SharedPreferences
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => authProvider),
+        ChangeNotifierProvider(create: (_) => PlanProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,23 +28,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Crea el TextTheme usando las fuentes especificadas
     final textTheme = createTextTheme(context, "Afacad", "Aboreto");
-    // Instancia MaterialTheme con el TextTheme
     final theme = MaterialTheme(textTheme);
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => PlanProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Modelaje 3D',
-        theme: theme.light(), // Tema claro
-        darkTheme: theme.dark(), // Tema oscuro
-        themeMode: ThemeMode.system, // Cambia automáticamente según el sistema
-        home: const LoginPage(),
-      ),
+    return MaterialApp(
+      title: 'Modelaje 3D',
+      theme: theme.light(),
+      darkTheme: theme.dark(),
+      themeMode: ThemeMode.system,
+      home: const LoginPage(),
+      debugShowCheckedModeBanner: false, // Recomendado para producción
     );
   }
 }

@@ -23,31 +23,20 @@ class DatabaseHelper {
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 3, // Incrementar versión por nuevos campos
+      version: 4, // Incrementar versión por nuevos campos
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE plans (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        category TEXT,
-        title TEXT,
-        imagePath TEXT,
-        description TEXT,
-        weapon TEXT,
-        role TEXT
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE,
-        password TEXT
-      )
-    ''');
+    await db.insert('users', {
+      'email': 'test@modelaje3d.com',
+      'password': _hashPassword('password123'),
+      'name': 'Usuario Prueba', // Nombre por defecto
+      'avatarPath': 'assets/images/FotoPerfil.jpeg',
+      'memberSince': DateTime.now().toIso8601String(),
+    });
     // Insertar usuario de prueba
     await db.insert('users', {
       'email': 'test@modelaje3d.com',
@@ -83,49 +72,10 @@ class DatabaseHelper {
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('''
-        CREATE TABLE users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          email TEXT UNIQUE,
-          password TEXT
-        )
-      ''');
-      await db.insert('users', {
-        'email': 'test@modelaje3d.com',
-        'password': _hashPassword('password123'),
-      });
-    }
-    if (oldVersion < 3) {
-      await db.execute('ALTER TABLE plans ADD COLUMN weapon TEXT');
-      await db.execute('ALTER TABLE plans ADD COLUMN role TEXT');
-      // Insertar personajes predefinidos
-      await db.insert('plans', {
-        'category': 'Medieval',
-        'title': 'Caballero Valiente',
-        'imagePath': 'assets/images/Medieval.png',
-        'description':
-            'Un guerrero con armadura pesada, ideal para combates cuerpo a cuerpo.',
-        'weapon': 'Espada Larga',
-        'role': 'Guerrero',
-      });
-      await db.insert('plans', {
-        'category': 'Shooter',
-        'title': 'Francotirador Élite',
-        'imagePath': 'assets/images/Shooter.png',
-        'description': 'Un experto en combate a distancia con precisión letal.',
-        'weapon': 'Rifle de Francotirador',
-        'role': 'Tirador',
-      });
-      await db.insert('plans', {
-        'category': 'Aventura',
-        'title': 'Explorador Místico',
-        'imagePath': 'assets/images/Adventura.png',
-        'description':
-            'Un aventurero que combina magia y habilidades de exploración.',
-        'weapon': 'Báculo Encantado',
-        'role': 'Mago',
-      });
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE users ADD COLUMN name TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN avatarPath TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN memberSince TEXT');
     }
   }
 
@@ -177,6 +127,7 @@ class DatabaseHelper {
     });
   }
 
+  // database_helper.dart
   Future<User?> loginUser(String email, String password) async {
     final db = await database;
     final result = await db.query(
@@ -184,10 +135,40 @@ class DatabaseHelper {
       where: 'email = ? AND password = ?',
       whereArgs: [email, _hashPassword(password)],
     );
+
     if (result.isNotEmpty) {
-      return User.fromMap(result.first);
+      return User(
+        id: result.first['id'] as int?,
+        email: result.first['email'] as String,
+        password: '', // No devolvemos la contraseña real
+        name: result.first['name'] as String?,
+        avatarPath: result.first['avatarPath'] as String?,
+        memberSince:
+            result.first['memberSince'] != null
+                ? DateTime.parse(result.first['memberSince'] as String)
+                : null,
+      );
     }
     return null;
+  }
+
+  Future<int> updateUserProfile({
+    required String email,
+    String? name,
+    String? avatarPath,
+  }) async {
+    final db = await database;
+
+    final updates = <String, dynamic>{};
+    if (name != null) updates['name'] = name;
+    if (avatarPath != null) updates['avatarPath'] = avatarPath;
+
+    return await db.update(
+      'users',
+      updates,
+      where: 'email = ?',
+      whereArgs: [email],
+    );
   }
 
   Future<void> close() async {

@@ -21,22 +21,24 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final user = await DatabaseHelper.instance.loginUser(
-        _emailController.text,
-        _passwordController.text,
-      );
-      setState(() => _isLoading = false);
-      if (user != null) {
-        authProvider.setUser(user);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const SplashScreen()),
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final user = await DatabaseHelper.instance.loginUser(
+          _emailController.text,
+          _passwordController.text,
         );
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Credenciales inválidas')));
+
+        if (user != null) {
+          await authProvider.setUser(
+            user,
+          ); // Esto guardará también en SharedPreferences
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const SplashScreen()),
+          );
+        }
+      } finally {
+        setState(() => _isLoading = false);
       }
     }
   }
