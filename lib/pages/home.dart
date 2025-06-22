@@ -7,6 +7,7 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'dart:async';
 import 'package:servicios_de_modelaje3d/pages/character_builder_page.dart';
+import 'package:servicios_de_modelaje3d/pages/profile_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -18,11 +19,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  // Actualizar la lista de títulos de página
   final List<String> pageTitles = ['Inicio', 'Favoritos', 'Arma tu personaje'];
   Timer? _carouselTimer;
 
-  // Modelos destacados (puedes reemplazar con datos reales)
+  // Modelos destacados
   final List<Map<String, dynamic>> featuredModels = [
     {
       'title': 'Caballero Élite',
@@ -47,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // Iniciar carrusel automático
     _startAutoCarousel();
   }
 
@@ -75,47 +74,82 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF3A3C3D),
+      // En el AppBar, modifica las actions:
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3A3C3D),
-        title: Text(pageTitles[_selectedIndex]),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          pageTitles[_selectedIndex],
+          style: const TextStyle(color: Colors.white),
+        ),
         actions:
             _selectedIndex == 0
                 ? [
                   IconButton(
-                    icon: const Icon(Icons.add),
+                    icon: const CircleAvatar(
+                      backgroundImage: AssetImage(
+                        'assets/images/FotoPerfil.jpeg',
+                      ),
+                      radius: 16,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const PlanFormPage()),
+                        MaterialPageRoute(builder: (_) => const ProfilePage()),
                       );
                     },
                   ),
                 ]
                 : null,
       ),
-      // Actualizar el body para incluir la nueva página
+      extendBody:
+          true, // Esto permite que el contenido fluya detrás del BottomNavigationBar
       body:
           [
             _buildHomeContent(planProvider),
             _buildFavorites(planProvider),
-            const CharacterBuilderPage(), // Nueva página
+            const CharacterBuilderPage(),
           ][_selectedIndex],
-      // Actualizar el BottomNavigationBar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFF600DD),
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favoritos',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.build),
-            label: 'Arma tu personaje',
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              spreadRadius: 0,
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-        ],
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            selectedItemColor: const Color(0xFFF600DD),
+            unselectedItemColor: Colors.white70,
+            onTap: _onItemTapped,
+            backgroundColor: Colors.black.withOpacity(0.7),
+            elevation: 0,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite),
+                label: 'Favoritos',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.build),
+                label: 'Arma tu personaje',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -165,12 +199,15 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(height: 15),
               ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Cotización iniciada')),
-                  );
+                  // Navegar a la página "Arma tu personaje"
+                  setState(() => _selectedIndex = 2);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF600DD),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
                 child: const Text('Cotizar'),
               ),
@@ -310,7 +347,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   duration: 800,
                 ),
               ),
-              // Nueva sección: Cómo funciona nuestro servicio
               _buildHowItWorksSection(),
               const SizedBox(height: 40),
             ],
@@ -320,6 +356,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // ... (resto de los métodos _buildHowItWorksSection, _buildFavorites, etc. permanecen iguales)
   Widget _buildHowItWorksSection() {
     return Column(
       children: [
@@ -539,10 +576,7 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(height: 30),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PlanFormPage()),
-            );
+            setState(() => _selectedIndex = 2);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF600DD),

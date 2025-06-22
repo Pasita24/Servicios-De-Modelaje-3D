@@ -12,16 +12,35 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
   String? _selectedCategory;
   String? _selectedGender;
   String? _selectedStyle;
-  String? _selectedWeapon;
-  String? _selectedAccessory;
+  bool _hasWeapon = false;
+  bool _hasAccessory = false;
+  String? _otherDetails;
+
+  // Mapa de modelos 3D por categoría
+  final Map<String, String> categoryModels = {
+    'Anime': 'assets/Anime.glb',
+    'Boss': 'assets/Boss.glb',
+    'LowPoly': 'assets/LowPoly.glb',
+    'Medieval': 'assets/Medieval.glb',
+    'Shooter': 'assets/Shooter.glb',
+  };
+
+  // Mapa de imágenes de fondo por categoría
+  final Map<String, String> categoryBackgrounds = {
+    'Anime': 'assets/images/AnimeImage.jpeg',
+    'Boss': 'assets/images/BossImage.jpeg',
+    'LowPoly': 'assets/images/LowPolyImage.jpeg',
+    'Medieval': 'assets/images/MedievalImage.jpeg',
+    'Shooter': 'assets/images/WarImage.jpeg',
+  };
 
   // Precios base para cada categoría
   final Map<String, int> categoryPrices = {
-    'Héroe': 100,
-    'Villano': 120,
-    'NPC': 80,
-    'Criatura': 150,
-    'Jefe': 200,
+    'Anime': 120,
+    'Boss': 200,
+    'LowPoly': 90,
+    'Medieval': 150,
+    'Shooter': 180,
   };
 
   // Precios adicionales por características
@@ -32,61 +51,30 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
   };
 
   final Map<String, int> stylePrices = {
-    'Fantasía': 30,
-    'Futurista': 40,
-    'Post-apocalíptico': 50,
-    'Medieval': 20,
-    'Moderno': 10,
+    'Realista': 50,
+    'Estilizado': 30,
+    'Pixel Art': 40,
+    'Cartoon': 20,
   };
 
-  final Map<String, int> weaponPrices = {
-    'Espada': 25,
-    'Arco': 20,
-    'Pistola láser': 35,
-    'Bastón mágico': 30,
-    'Ninguna': 0,
-  };
-
-  final Map<String, int> accessoryPrices = {
-    'Capa': 15,
-    'Armadura pesada': 40,
-    'Gafas de realidad aumentada': 25,
-    'Amuleto mágico': 20,
-    'Ninguno': 0,
-  };
+  final int weaponPrice = 35;
+  final int accessoryPrice = 25;
 
   final List<String> categories = [
-    'Héroe',
-    'Villano',
-    'NPC',
-    'Criatura',
-    'Jefe',
+    'Anime',
+    'Boss',
+    'LowPoly',
+    'Medieval',
+    'Shooter',
   ];
 
   final List<String> genders = ['Masculino', 'Femenino', 'Otro'];
 
   final List<String> styles = [
-    'Fantasía',
-    'Futurista',
-    'Post-apocalíptico',
-    'Medieval',
-    'Moderno',
-  ];
-
-  final List<String> weapons = [
-    'Espada',
-    'Arco',
-    'Pistola láser',
-    'Bastón mágico',
-    'Ninguna',
-  ];
-
-  final List<String> accessories = [
-    'Capa',
-    'Armadura pesada',
-    'Gafas de realidad aumentada',
-    'Amuleto mágico',
-    'Ninguno',
+    'Realista',
+    'Estilizado',
+    'Pixel Art',
+    'Cartoon',
   ];
 
   // Función para calcular el precio total
@@ -102,11 +90,11 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
     if (_selectedStyle != null) {
       total += stylePrices[_selectedStyle]!;
     }
-    if (_selectedWeapon != null) {
-      total += weaponPrices[_selectedWeapon]!;
+    if (_hasWeapon) {
+      total += weaponPrice;
     }
-    if (_selectedAccessory != null) {
-      total += accessoryPrices[_selectedAccessory]!;
+    if (_hasAccessory) {
+      total += accessoryPrice;
     }
 
     return total;
@@ -114,100 +102,188 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundImage =
+        _selectedCategory != null
+            ? categoryBackgrounds[_selectedCategory]
+            : 'assets/images/Fondo_main.jpeg';
+
     return Scaffold(
       backgroundColor: const Color(0xFF3A3C3D),
       appBar: AppBar(
         backgroundColor: const Color(0xFF3A3C3D),
-        title: const Text(
-          'Constructor de Personajes 3D',
-        ), // Título único y más descriptivo
+        title: const Text('Constructor de Personajes 3D'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 300, child: _buildModelPreview()),
-            const SizedBox(height: 20),
-
-            _buildSelectionCard(
-              title: 'Categoría',
-              value: _selectedCategory,
-              items: categories,
-              onChanged: (value) {
-                setState(() => _selectedCategory = value);
-              },
-            ),
-
-            _buildSelectionCard(
-              title: 'Género',
-              value: _selectedGender,
-              items: genders,
-              onChanged: (value) {
-                setState(() => _selectedGender = value);
-              },
-            ),
-
-            _buildSelectionCard(
-              title: 'Estilo',
-              value: _selectedStyle,
-              items: styles,
-              onChanged: (value) {
-                setState(() => _selectedStyle = value);
-              },
-            ),
-
-            _buildSelectionCard(
-              title: 'Arma',
-              value: _selectedWeapon,
-              items: weapons,
-              onChanged: (value) {
-                setState(() => _selectedWeapon = value);
-              },
-            ),
-
-            _buildSelectionCard(
-              title: 'Accesorio',
-              value: _selectedAccessory,
-              items: accessories,
-              onChanged: (value) {
-                setState(() => _selectedAccessory = value);
-              },
-            ),
-
-            const SizedBox(height: 30),
-
-            ElevatedButton(
-              onPressed:
-                  _selectedCategory != null
-                      ? () => _showQuoteDialog(context)
-                      : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF600DD),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 16,
+      body: Stack(
+        children: [
+          // Fondo dinámico con efecto de opacidad
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(backgroundImage!),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.5),
+                    BlendMode.darken,
+                  ),
                 ),
               ),
-              child: const Text(
-                'Generar Cotización',
-                style: TextStyle(fontSize: 18),
-              ),
             ),
+          ),
 
-            const SizedBox(height: 40),
-          ],
-        ),
+          // Contenido principal
+          SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 100),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 300,
+                  child: _buildModelPreview(_selectedCategory),
+                ),
+                const SizedBox(height: 20),
+
+                // Selectores de características
+                _buildSelectionCard(
+                  title: 'Categoría',
+                  value: _selectedCategory,
+                  items: categories,
+                  onChanged: (value) {
+                    setState(() => _selectedCategory = value);
+                  },
+                ),
+
+                _buildSelectionCard(
+                  title: 'Género',
+                  value: _selectedGender,
+                  items: genders,
+                  onChanged: (value) {
+                    setState(() => _selectedGender = value);
+                  },
+                ),
+
+                _buildSelectionCard(
+                  title: 'Estilo',
+                  value: _selectedStyle,
+                  items: styles,
+                  onChanged: (value) {
+                    setState(() => _selectedStyle = value);
+                  },
+                ),
+
+                _buildToggleCard(
+                  title: '¿Incluir arma?',
+                  value: _hasWeapon,
+                  onChanged: (value) {
+                    setState(() => _hasWeapon = value!);
+                  },
+                ),
+
+                _buildToggleCard(
+                  title: '¿Incluir accesorio?',
+                  value: _hasAccessory,
+                  onChanged: (value) {
+                    setState(() => _hasAccessory = value!);
+                  },
+                ),
+
+                _buildTextInputCard(
+                  title: 'Otros detalles',
+                  hint: 'Especificaciones adicionales',
+                  onChanged: (value) {
+                    setState(() => _otherDetails = value);
+                  },
+                ),
+
+                const SizedBox(height: 30),
+
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 80,
+                  ), // Añade este Padding alrededor del ElevatedButton
+                  child: ElevatedButton(
+                    onPressed:
+                        _selectedCategory != null
+                            ? () => _showQuoteDialog(context)
+                            : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF600DD),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 16,
+                      ),
+                      elevation: 8,
+                    ),
+                    child: const Text(
+                      'Generar Cotización',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildModelPreview() {
-    return ModelViewer(
-      src: 'assets/camaraman.glb',
-      alt: 'Modelo 3D de personaje',
-      ar: false,
-      autoRotate: true,
-      cameraControls: true,
-      backgroundColor: Colors.transparent,
+  Widget _buildModelPreview(String? category) {
+    final modelPath =
+        category != null
+            ? categoryModels[category] ?? 'assets/camaraman.glb'
+            : 'assets/camaraman.glb';
+
+    return FutureBuilder(
+      future: DefaultAssetBundle.of(context).load(modelPath),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: ModelViewer(
+                src: modelPath,
+                alt: 'Modelo 3D de personaje ${category ?? 'genérico'}',
+                ar: false,
+                autoRotate: true,
+                cameraControls: true,
+                backgroundColor: Colors.transparent,
+              ),
+            ),
+          );
+        }
+        return Center(
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF600DD)),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -219,7 +295,9 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: const Color(0xFF3c096c),
+      color: const Color(0xFF3c096c).withOpacity(0.8),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -241,6 +319,11 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
               ),
               items:
@@ -252,6 +335,93 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
                   }).toList(),
               onChanged: onChanged,
               hint: const Text('Selecciona una opción'),
+              dropdownColor: Colors.white,
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggleCard({
+    required String title,
+    required bool value,
+    required Function(bool?) onChanged,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: const Color(0xFF3c096c).withOpacity(0.8),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: const Color(0xFFF600DD),
+              activeTrackColor: Colors.purple[200],
+              inactiveThumbColor: Colors.grey[300],
+              inactiveTrackColor: Colors.grey[500],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextInputCard({
+    required String title,
+    required String hint,
+    required Function(String) onChanged,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: const Color(0xFF3c096c).withOpacity(0.8),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: hint,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+              onChanged: onChanged,
+              maxLines: 3,
+              style: const TextStyle(color: Colors.black87),
             ),
           ],
         ),
@@ -265,113 +435,198 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            backgroundColor: const Color(0xFF3c096c),
-            title: const Text(
-              'Cotización de tu personaje',
-              style: TextStyle(color: Colors.white),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_selectedCategory != null)
-                  _buildQuoteDetailItem(
-                    'Categoría',
-                    _selectedCategory!,
-                    '\$${categoryPrices[_selectedCategory]}',
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF3c096c).withOpacity(0.9),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
                   ),
-
-                if (_selectedGender != null)
-                  _buildQuoteDetailItem(
-                    'Género',
-                    _selectedGender!,
-                    '\$${genderPrices[_selectedGender]}',
+                ],
+              ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Cotización de tu personaje',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 20),
 
-                if (_selectedStyle != null)
-                  _buildQuoteDetailItem(
-                    'Estilo',
-                    _selectedStyle!,
-                    '\$${stylePrices[_selectedStyle]}',
-                  ),
+                  if (_selectedCategory != null)
+                    _buildQuoteDetailItem(
+                      'Categoría',
+                      _selectedCategory!,
+                      '\$${categoryPrices[_selectedCategory]}',
+                    ),
 
-                if (_selectedWeapon != null)
+                  if (_selectedGender != null)
+                    _buildQuoteDetailItem(
+                      'Género',
+                      _selectedGender!,
+                      '\$${genderPrices[_selectedGender]}',
+                    ),
+
+                  if (_selectedStyle != null)
+                    _buildQuoteDetailItem(
+                      'Estilo',
+                      _selectedStyle!,
+                      '\$${stylePrices[_selectedStyle]}',
+                    ),
+
                   _buildQuoteDetailItem(
                     'Arma',
-                    _selectedWeapon!,
-                    '\$${weaponPrices[_selectedWeapon]}',
+                    _hasWeapon ? 'Sí' : 'No',
+                    _hasWeapon ? '\$$weaponPrice' : '\$0',
                   ),
 
-                if (_selectedAccessory != null)
                   _buildQuoteDetailItem(
                     'Accesorio',
-                    _selectedAccessory!,
-                    '\$${accessoryPrices[_selectedAccessory]}',
+                    _hasAccessory ? 'Sí' : 'No',
+                    _hasAccessory ? '\$$accessoryPrice' : '\$0',
                   ),
 
-                const SizedBox(height: 20),
-                const Divider(color: Colors.white70),
-                const SizedBox(height: 10),
+                  if (_otherDetails != null && _otherDetails!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Otros detalles:',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _otherDetails!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 20),
+                  const Divider(color: Colors.white70),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total:',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '\$$totalPrice',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        '\$$totalPrice',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Atrás',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Cotización enviada a tu correo'),
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF600DD),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Enviar Cotización',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Atrás',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Cotización enviada a tu correo'),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF600DD),
-                ),
-                child: const Text('Enviar Cotización'),
-              ),
-            ],
           ),
     );
   }
 
   Widget _buildQuoteDetailItem(String title, String value, String price) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('$title: $value', style: const TextStyle(color: Colors.white)),
-          Text(price, style: const TextStyle(color: Colors.white)),
+          Text(
+            '$title:',
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            price,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

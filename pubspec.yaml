@@ -77,7 +77,18 @@ flutter:
       - assets/images/Logo.png
       - assets/images/Adventura.png
       - assets/images/Fondo_main.jpeg
+      - assets/images/AnimeImage.jpeg
+      - assets/images/BossImage.jpeg
+      - assets/images/WarImage.jpeg
+      - assets/images/MedievalImage.jpeg
+      - assets/images/LowPolyImage.jpeg
+      - assets/images/FotoPerfil.jpeg
       - assets/camaraman.glb
+      - assets/Anime.glb
+      - assets/Boss.glb
+      - assets/LowPoly.glb
+      - assets/Medieval.glb
+      - assets/Shooter.glb
       - assets/icons/Logo.png # Agrega el archivo de ícono aquí
 android_12:
     # The image parameter sets the splash screen icon image.  If this parameter is not specified,
