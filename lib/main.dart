@@ -5,6 +5,7 @@ import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
 import 'package:servicios_de_modelaje3d/services/plan_provider.dart';
 import 'package:servicios_de_modelaje3d/themes/theme.dart'; // Importa theme.dart
 import 'package:servicios_de_modelaje3d/utils/util.dart'; // Importa util.dart
+import 'package:servicios_de_modelaje3d/pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,12 @@ class MyApp extends StatelessWidget {
     final theme = MaterialTheme(textTheme);
 
     return MaterialApp(
+      // En tu MaterialApp dentro de MyApp, agrega:
+      routes: {
+        '/home':
+            (context) =>
+                const MyHomePage(title: 'Inicio'), // Cambiado a MyHomePage
+      },
       title: 'Modelaje 3D',
       theme: theme.light(),
       darkTheme: theme.dark(),

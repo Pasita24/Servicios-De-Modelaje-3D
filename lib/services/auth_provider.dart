@@ -54,6 +54,39 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> registerUser({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    final dbHelper = DatabaseHelper.instance;
+
+    // Verificar si el email ya existe
+    final existingUser = await dbHelper.loginUser(email, password);
+    if (existingUser != null) {
+      throw Exception('El correo electrónico ya está registrado');
+    }
+
+    // Crear nuevo usuario
+    final newUser = User(
+      email: email,
+      password: password, // Será hasheado en DatabaseHelper
+      name: name,
+      avatarPath: 'assets/images/FotoPerfil.jpeg',
+      memberSince: DateTime.now(),
+    );
+
+    // Guardar en SQLite
+    final userId = await dbHelper.createUser(newUser);
+
+    if (userId > 0) {
+      // Actualizar el ID y establecer el usuario
+      await setUser(newUser.copyWith(id: userId));
+    } else {
+      throw Exception('Error al registrar el usuario');
+    }
+  }
+
   Future<void> updateProfile({String? name, String? avatarPath}) async {
     if (_user == null) return;
 

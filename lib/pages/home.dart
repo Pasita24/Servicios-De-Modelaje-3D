@@ -8,6 +8,7 @@ import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'dart:async';
 import 'package:servicios_de_modelaje3d/pages/character_builder_page.dart';
 import 'package:servicios_de_modelaje3d/pages/profile_page.dart';
+import 'package:servicios_de_modelaje3d/pages/about_us_page.dart'; // Agrega esta línea
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -19,7 +20,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  final List<String> pageTitles = ['Inicio', 'Favoritos', 'Arma tu personaje'];
+  final List<String> pageTitles = [
+    'Inicio',
+    'Arma tu personaje',
+    'Sobre Nosotros',
+  ];
   Timer? _carouselTimer;
 
   // Modelos destacados
@@ -107,8 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body:
           [
             _buildHomeContent(planProvider),
-            _buildFavorites(planProvider),
             const CharacterBuilderPage(),
+            const AboutUsPage(), // Nueva página que crearemos
           ][_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -137,15 +142,16 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.black.withOpacity(0.7),
             elevation: 0,
             type: BottomNavigationBarType.fixed,
+            // En el BottomNavigationBar:
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
-                label: 'Favoritos',
-              ),
-              BottomNavigationBarItem(
                 icon: Icon(Icons.build),
                 label: 'Arma tu personaje',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.info),
+                label: 'Sobre Nosotros',
               ),
             ],
           ),
@@ -356,7 +362,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // ... (resto de los métodos _buildHowItWorksSection, _buildFavorites, etc. permanecen iguales)
   Widget _buildHowItWorksSection() {
     return Column(
       children: [

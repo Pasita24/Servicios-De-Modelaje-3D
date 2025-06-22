@@ -30,18 +30,16 @@ class DatabaseHelper {
   }
 
   Future _createDB(Database db, int version) async {
-    await db.insert('users', {
-      'email': 'test@modelaje3d.com',
-      'password': _hashPassword('password123'),
-      'name': 'Usuario Prueba', // Nombre por defecto
-      'avatarPath': 'assets/images/FotoPerfil.jpeg',
-      'memberSince': DateTime.now().toIso8601String(),
-    });
-    // Insertar usuario de prueba
-    await db.insert('users', {
-      'email': 'test@modelaje3d.com',
-      'password': _hashPassword('password123'),
-    });
+    await db.execute('''
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      name TEXT,
+      avatarPath TEXT,
+      memberSince TEXT
+    )
+  ''');
     // Insertar personajes predefinidos
     await db.insert('plans', {
       'category': 'Medieval',
@@ -71,11 +69,37 @@ class DatabaseHelper {
     });
   }
 
+  Future<bool> isEmailRegistered(String email) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<int> createUser(User user) async {
+    final db = await database;
+    return await db.insert('users', {
+      'email': user.email,
+      'password': _hashPassword(user.password),
+      'name': user.name,
+      'avatarPath': user.avatarPath,
+      'memberSince': user.memberSince?.toIso8601String(),
+    });
+  }
+
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 4) {
-      await db.execute('ALTER TABLE users ADD COLUMN name TEXT');
-      await db.execute('ALTER TABLE users ADD COLUMN avatarPath TEXT');
-      await db.execute('ALTER TABLE users ADD COLUMN memberSince TEXT');
+      try {
+        await db.execute('ALTER TABLE users ADD COLUMN name TEXT');
+        await db.execute('ALTER TABLE users ADD COLUMN avatarPath TEXT');
+        await db.execute('ALTER TABLE users ADD COLUMN memberSince TEXT');
+      } catch (e) {
+        // Ignorar el error si las columnas ya existen
+        print('Algunas columnas ya existían: $e');
+      }
     }
   }
 
@@ -117,14 +141,6 @@ class DatabaseHelper {
   Future<int> deletePlan(int id) async {
     final db = await database;
     return await db.delete('plans', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<int> createUser(User user) async {
-    final db = await database;
-    return await db.insert('users', {
-      'email': user.email,
-      'password': _hashPassword(user.password),
-    });
   }
 
   // database_helper.dart

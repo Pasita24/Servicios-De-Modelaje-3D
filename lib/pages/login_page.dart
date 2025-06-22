@@ -4,6 +4,7 @@ import 'package:servicios_de_modelaje3d/models/user.dart';
 import 'package:servicios_de_modelaje3d/pages/splash.dart';
 import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
 import 'package:servicios_de_modelaje3d/services/database_helper.dart';
+import 'package:servicios_de_modelaje3d/pages/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -101,6 +102,20 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: const Text('Iniciar Sesión'),
                     ),
+                // Agrega este widget al final de la columna de hijos en tu LoginPage:
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RegisterPage()),
+                    );
+                  },
+                  child: const Text(
+                    '¿No tienes cuenta? Regístrate',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
               ],
             ),
           ),
