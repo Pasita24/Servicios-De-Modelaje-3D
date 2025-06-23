@@ -21,9 +21,12 @@ class PlanProvider with ChangeNotifier {
     try {
       final db = DatabaseHelper.instance;
       _plans = await db.getPlans();
-      notifyListeners();
+    } catch (e) {
+      debugPrint('Error al cargar planes: $e');
+      _plans = []; // Lista vacía como fallback
     } finally {
       _isLoading = false;
+      notifyListeners();
     }
   }
 

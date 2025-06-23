@@ -36,13 +36,14 @@ class DatabaseHelper {
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 5, // Incrementar versión por nuevos campos
+      version: 6, // Incrementar versión por nuevos campos
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
+    // 1. Primero crea TODAS las tablas
     await db.execute('''
     CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +55,23 @@ class DatabaseHelper {
       has_completed_survey INTEGER DEFAULT 0
     )
   ''');
+
+    await db.execute('''
+    CREATE TABLE plans (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      category TEXT,
+      title TEXT,
+      imagePath TEXT,
+      description TEXT,
+      weapon TEXT,
+      role TEXT
+    )
+  ''');
+    // 2. Luego inserta los datos iniciales
+    await _insertInitialPlans(db); // Método separado para claridad
+  }
+
+  Future _insertInitialPlans(Database db) async {
     // Insertar personajes predefinidos
     await db.insert('plans', {
       'category': 'Medieval',
@@ -104,26 +122,33 @@ class DatabaseHelper {
     });
   }
 
-  // En el método _upgradeDB, añade la migración:
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 4) {
-      try {
-        await db.execute('ALTER TABLE users ADD COLUMN name TEXT');
-        await db.execute('ALTER TABLE users ADD COLUMN avatarPath TEXT');
-        await db.execute('ALTER TABLE users ADD COLUMN memberSince TEXT');
-      } catch (e) {
-        print('Algunas columnas ya existían: $e');
-      }
-    }
-
     if (oldVersion < 5) {
-      // Añade esta nueva condición
       try {
+        // Migración para usuarios
         await db.execute(
           'ALTER TABLE users ADD COLUMN has_completed_survey INTEGER DEFAULT 0',
         );
+
+        // ¡Añade la creación de la tabla plans si no existe!
+        await db.execute('''
+        CREATE TABLE IF NOT EXISTS plans (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          category TEXT,
+          title TEXT,
+          imagePath TEXT,
+          description TEXT,
+          weapon TEXT,
+          role TEXT
+        )
+      ''');
+
+        // Opcional: Insertar datos iniciales si es la primera vez
+        if (oldVersion < 4) {
+          await _insertInitialPlans(db);
+        }
       } catch (e) {
-        print('La columna has_completed_survey ya existía: $e');
+        print('Error en migración: $e');
       }
     }
   }

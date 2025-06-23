@@ -157,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildHomeContent(PlanProvider planProvider) {
     return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: 80),
       child: Stack(
         children: [
           Container(
@@ -224,7 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               SizedBox(
-                height: 420,
+                height: 380, // Reducimos la altura del contenedor del Swiper
                 child: Swiper(
                   itemCount: featuredModels.length,
                   itemBuilder: (context, index) {
@@ -232,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
-                        vertical: 30.0,
+                        vertical: 20.0, // Reducimos el padding vertical
                       ),
                       child: Container(
                         decoration: BoxDecoration(
@@ -251,11 +252,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
+                            Transform.translate(
+                              offset: Offset(0, 20),
                               child: Image.asset(
+                                // Eliminamos el ClipRRect
                                 model['image'],
                                 height: 160,
                                 width: double.infinity,
@@ -271,7 +271,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     model['title'],
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize:
+                                          16, // Reducimos el tamaño de fuente
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -281,29 +282,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                       const Icon(
                                         Icons.star,
                                         color: Colors.amber,
-                                        size: 20,
+                                        size:
+                                            16, // Reducimos el tamaño del icono
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         ' ${model['rating']}',
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 14,
+                                          fontSize:
+                                              12, // Reducimos el tamaño de fuente
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(
+                                    height: 6,
+                                  ), // Reducimos el espacio
                                   Text(
                                     model['description'],
                                     style: const TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 14,
+                                      fontSize:
+                                          12, // Reducimos el tamaño de fuente
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 8),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -312,18 +318,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                         '\$25',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 18,
+                                          fontSize:
+                                              16, // Reducimos el tamaño de fuente
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      // En el método _buildHomeContent, dentro del Swiper itemBuilder:
                                       FloatingActionButton(
                                         mini: true,
                                         heroTag: 'fab_${model['title']}_$index',
                                         onPressed: () {
-                                          setState(
-                                            () => _selectedIndex = 1,
-                                          ); // Cambiado para navegar a "Arma tu personaje"
+                                          setState(() => _selectedIndex = 1);
                                         },
                                         backgroundColor: const Color(
                                           0xFFd3d3d3,
@@ -331,7 +335,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                         foregroundColor: const Color(
                                           0xFFF600DD,
                                         ),
-                                        child: const Icon(Icons.add),
+                                        child: const Icon(
+                                          Icons.add,
+                                          size: 18,
+                                        ), // Reducimos el icono
                                       ),
                                     ],
                                   ),

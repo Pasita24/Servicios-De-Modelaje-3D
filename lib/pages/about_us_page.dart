@@ -234,7 +234,7 @@ class AboutUsPage extends StatelessWidget {
                   const SizedBox(width: 8),
                   _buildWorkSample('assets/images/Adventura.png'),
                   const SizedBox(width: 8),
-                  _buildWorkSample('assets/images/AnimeImage.jpeg'),
+                  _buildWorkSample('assets/images/sniper.png'),
                 ],
               ),
             ),

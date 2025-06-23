@@ -32,10 +32,11 @@ class PlanData {
   factory PlanData.fromMap(Map<String, dynamic> map) {
     return PlanData(
       id: map['id'] as int?,
-      category: map['category'] as String,
-      title: map['title'] as String,
-      imagePath: map['imagePath'] as String? ?? 'assets/images/Medieval.png',
-      description: map['description'] as String,
+      category:
+          map['category'] as String? ?? 'Sin categoría', // Valor por defecto
+      title: map['title'] as String? ?? 'Sin título',
+      imagePath: map['imagePath'] as String? ?? 'assets/images/default.png',
+      description: map['description'] as String? ?? 'Sin descripción',
       weapon: map['weapon'] as String? ?? 'Desconocido',
       role: map['role'] as String? ?? 'Desconocido',
     );

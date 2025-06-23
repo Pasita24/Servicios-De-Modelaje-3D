@@ -40,6 +40,9 @@ dependencies:
   shared_preferences: ^2.5.3
   mailer: ^6.4.1
   flutter_dotenv: ^5.2.1
+  exif: ^3.3.0
+  image: ^4.5.4
+  flutter_exif_rotation: ^0.5.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,6 +72,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+    # Añade esto:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -85,7 +89,7 @@ flutter:
       - assets/images/BossImage.jpeg
       - assets/images/WarImage.jpeg
       - assets/images/MedievalImage.jpeg
-      - assets/images/LowPolyImage.jpeg
+      - assets/images/LowPolyImage.jpg
       - assets/images/FotoPerfil.jpeg
       - assets/images/FotoPerfil2.jpeg
       - assets/images/FotoPerfil3.jpeg
@@ -100,6 +104,7 @@ flutter:
       - assets/LowPoly.glb
       - assets/Medieval.glb
       - assets/Shooter.glb
+      - assets/model1.glb
       - assets/icons/Logo.png # Agrega el archivo de ícono aquí
 android_12:
     # The image parameter sets the splash screen icon image.  If this parameter is not specified,

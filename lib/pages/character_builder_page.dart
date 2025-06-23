@@ -3,6 +3,8 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
 import 'package:servicios_de_modelaje3d/services/email_service.dart';
+import 'package:flutter/services.dart'; // Agrega esta línea
+import 'package:image/image.dart' as img;
 
 class CharacterBuilderPage extends StatefulWidget {
   const CharacterBuilderPage({super.key});
@@ -32,10 +34,22 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
   final Map<String, String> categoryBackgrounds = {
     'Anime': 'assets/images/AnimeImage.jpeg',
     'Boss': 'assets/images/BossImage.jpeg',
-    'LowPoly': 'assets/images/LowPolyImage.jpeg',
+    'LowPoly': 'assets/images/LowPolyImage.jpg',
     'Medieval': 'assets/images/MedievalImage.jpeg',
     'Shooter': 'assets/images/WarImage.jpeg',
   };
+  Future<ImageProvider> _loadImage(String path) async {
+    final byteData = await rootBundle.load(path);
+    final bytes = byteData.buffer.asUint8List();
+
+    // Corregir orientación EXIF si es necesario
+    final originalImage = img.decodeImage(bytes)!;
+    final fixedImage = img.bakeOrientation(
+      originalImage,
+    ); // Corrige la orientación
+
+    return MemoryImage(img.encodePng(fixedImage));
+  }
 
   // Precios base para cada categoría
   final Map<String, int> categoryPrices = {
@@ -115,18 +129,31 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
       body: Stack(
         children: [
           // Fondo dinámico con efecto de opacidad
+          // Luego modifica el Positioned.fill
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(backgroundImage!),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.5),
-                    BlendMode.darken,
-                  ),
-                ),
-              ),
+            child: FutureBuilder<ImageProvider>(
+              future: _loadImage(backgroundImage!),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity(), // Elimina cualquier rotación
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: snapshot.data!,
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.5),
+                            BlendMode.darken,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return Container(color: Colors.black);
+              },
             ),
           ),
 
