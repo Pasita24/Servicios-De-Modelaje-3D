@@ -29,12 +29,13 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
+  // Modificar el método _showSurveyDialog para verificar correctamente el estado
   Future<void> _showSurveyDialog() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.user;
 
-    // Verificar si ya completó la encuesta
-    if (user?.hasCompletedSurvey ?? false) {
+    // Verificar si ya completó la encuesta (usando el valor directamente del provider)
+    if (user?.hasCompletedSurvey ?? true) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -58,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
           responses: surveyResponses,
         );
 
-        // Actualizar el estado del usuario
+        // Actualizar el estado del usuario tanto en SQLite como en SharedPreferences
         await authProvider.updateSurveyCompletion(true);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,12 +141,32 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: () async {
                 // Aquí puedes implementar la lógica para cambiar la foto de perfil
               },
-              child: CircleAvatar(
+              child: // Modificar el CircleAvatar para mejorar la visualización de la imagen
+                  CircleAvatar(
                 radius: 60,
-                backgroundImage:
-                    user.avatarPath != null
-                        ? AssetImage(user.avatarPath!)
-                        : const AssetImage('assets/images/FotoPerfil.jpeg'),
+                backgroundColor:
+                    Colors.grey[800], // Fondo para cuando no hay imagen
+                child: ClipOval(
+                  child:
+                      user.avatarPath != null
+                          ? Image.asset(
+                            user.avatarPath!,
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => const Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.white,
+                                ),
+                          )
+                          : const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                ),
               ),
             ),
             const SizedBox(height: 20),

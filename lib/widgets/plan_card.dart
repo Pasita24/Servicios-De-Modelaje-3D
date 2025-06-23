@@ -62,7 +62,7 @@ class PlanCard extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
-                  top: 100,
+                  top: 120, // Aumentado para dar más espacio a la imagen
                   left: 20,
                   right: 15,
                   bottom: 20,
@@ -131,7 +131,7 @@ class PlanCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: -40,
+              top: -30, // Reducido el desplazamiento hacia arriba
               left: 0,
               right: 0,
               child: Center(
@@ -151,7 +151,10 @@ class PlanCard extends StatelessWidget {
                   child: ClipOval(
                     child:
                         imagePath.isNotEmpty
-                            ? Image.asset(imagePath, fit: BoxFit.cover)
+                            ? Image.asset(
+                              imagePath,
+                              fit: BoxFit.scaleDown, // Cambiado a scaleDown
+                            )
                             : const Icon(
                               Icons.image,
                               size: 100,

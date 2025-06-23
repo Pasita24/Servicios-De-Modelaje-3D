@@ -15,22 +15,25 @@ class AuthProvider with ChangeNotifier {
     await _loadUserFromPrefs();
   }
 
+  // Modificar el método _loadUserFromPrefs para cargar correctamente el estado de la encuesta
   Future<void> _loadUserFromPrefs() async {
     final email = _prefs.getString('user_email');
     final name = _prefs.getString('user_name');
     final avatarPath = _prefs.getString('user_avatar');
     final memberSince = _prefs.getString('user_member_since');
-    final hasCompletedSurvey =
-        _prefs.getBool('has_completed_survey') ?? false; // Nuevo
+    final hasCompletedSurvey = _prefs.getBool('has_completed_survey') ?? false;
 
     if (email != null) {
+      // Verificar en la base de datos SQLite el estado real
+      final dbUser = await DatabaseHelper.instance.loginUser(email, '');
+
       _user = User(
         email: email,
         password: '', // No guardamos la contraseña en SharedPreferences
         name: name,
         avatarPath: avatarPath,
         memberSince: memberSince != null ? DateTime.parse(memberSince) : null,
-        hasCompletedSurvey: hasCompletedSurvey,
+        hasCompletedSurvey: dbUser?.hasCompletedSurvey ?? hasCompletedSurvey,
       );
       notifyListeners();
     }

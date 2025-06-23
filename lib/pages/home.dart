@@ -252,14 +252,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // En la parte del Swiper dentro de _buildHomeContent, modificar la sección de la imagen:
                             Transform.translate(
                               offset: Offset(0, 20),
-                              child: Image.asset(
-                                // Eliminamos el ClipRRect
-                                model['image'],
+                              child: Container(
                                 height: 160,
                                 width: double.infinity,
-                                fit: BoxFit.cover,
+                                child: Image.asset(
+                                  model['image'],
+                                  fit:
+                                      BoxFit
+                                          .contain, // Cambiado de cover a contain
+                                ),
                               ),
                             ),
                             Padding(

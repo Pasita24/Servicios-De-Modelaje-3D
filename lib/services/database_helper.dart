@@ -193,13 +193,14 @@ class DatabaseHelper {
     return await db.delete('plans', where: 'id = ?', whereArgs: [id]);
   }
 
-  // database_helper.dart
+  // Modificar el método loginUser para incluir has_completed_survey
   Future<User?> loginUser(String email, String password) async {
     final db = await database;
     final result = await db.query(
       'users',
-      where: 'email = ? AND password = ?',
-      whereArgs: [email, _hashPassword(password)],
+      where: 'email = ? ${password.isNotEmpty ? 'AND password = ?' : ''}',
+      whereArgs:
+          password.isNotEmpty ? [email, _hashPassword(password)] : [email],
     );
 
     if (result.isNotEmpty) {
@@ -213,6 +214,7 @@ class DatabaseHelper {
             result.first['memberSince'] != null
                 ? DateTime.parse(result.first['memberSince'] as String)
                 : null,
+        hasCompletedSurvey: (result.first['has_completed_survey'] as int?) == 1,
       );
     }
     return null;
