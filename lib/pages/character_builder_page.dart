@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
+import 'package:servicios_de_modelaje3d/services/email_service.dart';
+import 'dart:convert'; // Para jsonEncode si lo necesitas
 
 class CharacterBuilderPage extends StatefulWidget {
   const CharacterBuilderPage({super.key});
@@ -431,6 +435,8 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
 
   void _showQuoteDialog(BuildContext context) {
     final totalPrice = _calculateTotalPrice();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
 
     showDialog(
       context: context,
@@ -569,27 +575,64 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
                       ),
                       const SizedBox(width: 16),
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Cotización enviada a tu correo'),
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                        onPressed: () async {
+                          try {
+                            final authProvider = Provider.of<AuthProvider>(
+                              context,
+                              listen: false,
+                            );
+                            final user = authProvider.user;
+
+                            if (user == null) {
+                              throw Exception('Usuario no autenticado');
+                            }
+
+                            final quoteDetails = {
+                              'Categoría':
+                                  _selectedCategory ?? 'No seleccionado',
+                              'Género': _selectedGender ?? 'No seleccionado',
+                              'Estilo': _selectedStyle ?? 'No seleccionado',
+                              'Arma': _hasWeapon ? 'Sí' : 'No',
+                              'Accesorio': _hasAccessory ? 'Sí' : 'No',
+                              'Detalles adicionales':
+                                  _otherDetails ?? 'Ninguno',
+                            };
+
+                            await EmailService.sendQuoteEmail(
+                              toEmail: user.email,
+                              userName: user.name ?? user.email,
+                              quoteDetails: quoteDetails,
+                              totalPrice: _calculateTotalPrice(),
+                            );
+
+                            Navigator.pop(
+                              context,
+                            ); // Mover el pop aquí después de completar la operación
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Cotización enviada exitosamente',
+                                ),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          } catch (e) {
+                            Navigator.pop(
+                              context,
+                            ); // También cerrar el diálogo en caso de error
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Error al enviar cotización: ${e.toString()}',
+                                ),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF600DD),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                        ),
-                        child: const Text(
-                          'Enviar Cotización',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        child: const Text('Enviar Cotización'),
                       ),
                     ],
                   ),

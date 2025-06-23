@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
+import 'package:servicios_de_modelaje3d/pages/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -147,7 +148,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   icon: Icons.logout,
                   onPressed: () async {
                     await authProvider.logout();
-                    Navigator.pop(context);
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                      (route) =>
+                          false, // Esto elimina todas las rutas anteriores
+                    );
                   },
                   color: Colors.red,
                 ),
