@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
 import 'package:servicios_de_modelaje3d/pages/login_page.dart';
+import 'package:servicios_de_modelaje3d/services/email_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,6 +27,51 @@ class _ProfilePageState extends State<ProfilePage> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showSurveyDialog() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+
+    // Verificar si ya completó la encuesta
+    if (user?.hasCompletedSurvey ?? false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Ya has completado la encuesta. ¡Gracias por tu feedback!',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final surveyResponses = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => const SurveyDialog3D(),
+    );
+
+    if (surveyResponses != null) {
+      try {
+        await EmailService.sendSurveyResults(
+          userName: user?.name ?? user?.email ?? 'Usuario',
+          userEmail: user?.email ?? 'No especificado',
+          responses: surveyResponses,
+        );
+
+        // Actualizar el estado del usuario
+        await authProvider.updateSurveyCompletion(true);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Gracias por tu feedback! Valoramos tu opinión'),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al enviar encuesta: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _editProfile() async {
@@ -93,14 +139,13 @@ class _ProfilePageState extends State<ProfilePage> {
             GestureDetector(
               onTap: () async {
                 // Aquí puedes implementar la lógica para cambiar la foto de perfil
-                // Por ejemplo, seleccionar una imagen de la galería
               },
               child: CircleAvatar(
                 radius: 60,
                 backgroundImage:
                     user.avatarPath != null
                         ? AssetImage(user.avatarPath!)
-                        : AssetImage('assets/images/FotoPerfil.jpeg'),
+                        : const AssetImage('assets/images/FotoPerfil.jpeg'),
               ),
             ),
             const SizedBox(height: 20),
@@ -150,11 +195,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     await authProvider.logout();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const LoginPage()),
-                      (route) =>
-                          false, // Esto elimina todas las rutas anteriores
+                      (route) => false,
                     );
                   },
                   color: Colors.red,
+                ),
+                // En el widget _buildActionButton para la encuesta, puedes añadir un indicador visual:
+                _buildActionButton(
+                  text: 'Responder Encuesta',
+                  icon: Icons.assignment,
+                  onPressed: _showSurveyDialog,
+                  color:
+                      (authProvider.user?.hasCompletedSurvey ?? false)
+                          ? Colors.grey
+                          : Colors.blue,
                 ),
               ],
             ),
@@ -236,6 +290,241 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(text, style: const TextStyle(color: Colors.white)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SurveyDialog3D extends StatefulWidget {
+  const SurveyDialog3D({super.key});
+
+  @override
+  _SurveyDialog3DState createState() => _SurveyDialog3DState();
+}
+
+class _SurveyDialog3DState extends State<SurveyDialog3D> {
+  int _currentSection = 0;
+  final PageController _pageController = PageController();
+
+  String _ageRange = '18-25';
+  String _userType = 'Diseñador';
+
+  Map<String, int> _ratings = {
+    'usabilidad': 3,
+    'modelos': 3,
+    'ar': 3,
+    'recomendacion': 3,
+  };
+
+  final TextEditingController _commentsController = TextEditingController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _commentsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Encuesta de Satisfacción - Modelaje 3D'),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 400,
+        child: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _buildDemographicsPage(),
+            _buildEvaluationPage(),
+            _buildCommentsPage(),
+          ],
+        ),
+      ),
+      actions: [
+        if (_currentSection > 0)
+          TextButton(
+            onPressed: () {
+              _pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              setState(() => _currentSection--);
+            },
+            child: const Text('Atrás'),
+          ),
+
+        ElevatedButton(
+          onPressed: () {
+            if (_currentSection < 2) {
+              _pageController.nextPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              setState(() => _currentSection++);
+            } else {
+              final responses = {
+                'edad': _ageRange,
+                'tipo_usuario': _userType,
+                ..._ratings,
+                'comentarios': _commentsController.text,
+              };
+              Navigator.pop(context, responses);
+            }
+          },
+          child: Text(_currentSection == 2 ? 'Enviar' : 'Siguiente'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDemographicsPage() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Datos demográficos',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+
+          const Text(
+            'Rango de edad:',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          DropdownButton<String>(
+            value: _ageRange,
+            isExpanded: true,
+            items:
+                const ['18-25', '26-35', '36-45', '46-55', '56+'].map((value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+            onChanged: (value) => setState(() => _ageRange = value!),
+          ),
+
+          const SizedBox(height: 20),
+          const Text(
+            '¿Cómo te describes?',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          DropdownButton<String>(
+            value: _userType,
+            isExpanded: true,
+            items:
+                const [
+                  'Diseñador',
+                  'Desarrollador de juegos',
+                  'Artista 3D',
+                  'Aficionado',
+                  'Otro',
+                ].map((value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+            onChanged: (value) => setState(() => _userType = value!),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEvaluationPage() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const Text(
+            'Evaluación de la aplicación',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+
+          _buildQuestion(
+            '1. ¿Qué tan fácil es usar la aplicación para crear personajes 3D?',
+            _ratings['usabilidad']!,
+            (value) => setState(() => _ratings['usabilidad'] = value),
+          ),
+
+          _buildQuestion(
+            '2. ¿Qué tan satisfecho/a estás con la variedad de modelos 3D disponibles?',
+            _ratings['modelos']!,
+            (value) => setState(() => _ratings['modelos'] = value),
+          ),
+
+          _buildQuestion(
+            '3. ¿Qué tan útil te resulta la función de visualización AR de los modelos?',
+            _ratings['ar']!,
+            (value) => setState(() => _ratings['ar'] = value),
+          ),
+
+          _buildQuestion(
+            '4. ¿Qué tan probable es que recomiendes esta aplicación a otros?',
+            _ratings['recomendacion']!,
+            (value) => setState(() => _ratings['recomendacion'] = value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommentsPage() {
+    return Column(
+      children: [
+        const Text(
+          'Comentarios adicionales',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        TextField(
+          controller: _commentsController,
+          decoration: const InputDecoration(
+            labelText: '¿Qué mejorarías o qué te gustó más?',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 5,
+        ),
+        const SizedBox(height: 20),
+        const Text('¡Gracias por tu tiempo!'),
+      ],
+    );
+  }
+
+  Widget _buildQuestion(String question, int value, Function(int) onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(question, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(5, (index) {
+              return IconButton(
+                icon: Icon(
+                  index < value ? Icons.star : Icons.star_border,
+                  color: Colors.amber,
+                  size: 30,
+                ),
+                onPressed: () => onChanged(index + 1),
+              );
+            }),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('1 - Muy malo', style: TextStyle(fontSize: 12)),
+              Text('5 - Muy bueno', style: TextStyle(fontSize: 12)),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }

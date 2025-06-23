@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:servicios_de_modelaje3d/widgets/favorite_plan_card.dart';
-import 'package:servicios_de_modelaje3d/pages/plan_form_page.dart';
 import 'package:servicios_de_modelaje3d/services/plan_provider.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'dart:async';
 import 'package:servicios_de_modelaje3d/pages/character_builder_page.dart';
 import 'package:servicios_de_modelaje3d/pages/profile_page.dart';
-import 'package:servicios_de_modelaje3d/pages/about_us_page.dart'; // Agrega esta línea
+import 'package:servicios_de_modelaje3d/pages/about_us_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -37,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
     },
     {
       'title': 'Francotirador Futurista',
-      'image': 'assets/images/Shooter.png',
+      'image': 'assets/images/sniper.png',
       'description': 'Diseño futurista con armas personalizables',
       'rating': 4.7,
     },
@@ -79,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF3A3C3D),
-      // En el AppBar, modifica las actions:
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -107,13 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ]
                 : null,
       ),
-      extendBody:
-          true, // Esto permite que el contenido fluya detrás del BottomNavigationBar
+      extendBody: true,
       body:
           [
             _buildHomeContent(planProvider),
             const CharacterBuilderPage(),
-            const AboutUsPage(), // Nueva página que crearemos
+            const AboutUsPage(),
           ][_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -142,7 +138,6 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.black.withOpacity(0.7),
             elevation: 0,
             type: BottomNavigationBarType.fixed,
-            // En el BottomNavigationBar:
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
               BottomNavigationBarItem(
@@ -205,8 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(height: 15),
               ElevatedButton(
                 onPressed: () {
-                  // Navegar a la página "Arma tu personaje"
-                  setState(() => _selectedIndex = 2);
+                  setState(() => _selectedIndex = 1); // Cambiado a índice 1
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF600DD),
@@ -322,11 +316,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
+                                      // En el método _buildHomeContent, dentro del Swiper itemBuilder:
                                       FloatingActionButton(
                                         mini: true,
                                         heroTag: 'fab_${model['title']}_$index',
                                         onPressed: () {
-                                          // Acción para agregar a favoritos
+                                          setState(
+                                            () => _selectedIndex = 1,
+                                          ); // Cambiado para navegar a "Arma tu personaje"
                                         },
                                         backgroundColor: const Color(
                                           0xFFd3d3d3,
@@ -416,7 +413,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: () {
-                          // Navegar a página de about
+                          setState(
+                            () => _selectedIndex = 1,
+                          ); // Cambiado a índice 1
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFF600DD),
@@ -435,7 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     right: Radius.circular(12),
                   ),
                   child: Image.asset(
-                    'assets/images/Fondo_main.jpeg',
+                    'assets/images/proceso1.png',
                     fit: BoxFit.cover,
                     height: 200,
                   ),
@@ -465,7 +464,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     left: Radius.circular(12),
                   ),
                   child: Image.asset(
-                    'assets/images/Fondo_main.jpeg',
+                    'assets/images/proceso2.png',
                     fit: BoxFit.cover,
                     height: 200,
                   ),
@@ -494,12 +493,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const PlanFormPage(),
-                            ),
-                          );
+                          setState(
+                            () => _selectedIndex = 1,
+                          ); // Cambiado a índice 1
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFF600DD),
@@ -557,6 +553,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.white60,
                         ),
                       ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(
+                            () => _selectedIndex = 1,
+                          ); // Cambiado a índice 1
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF600DD),
+                          minimumSize: const Size(120, 40),
+                        ),
+                        child: const Text('Crear Personaje'),
+                      ),
                     ],
                   ),
                 ),
@@ -568,7 +577,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     right: Radius.circular(12),
                   ),
                   child: Image.asset(
-                    'assets/images/Fondo_main.jpeg',
+                    'assets/images/proceso3.png',
                     fit: BoxFit.cover,
                     height: 200,
                   ),
@@ -581,7 +590,7 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(height: 30),
         ElevatedButton(
           onPressed: () {
-            setState(() => _selectedIndex = 2);
+            setState(() => _selectedIndex = 1); // Cambiado a índice 1
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF600DD),
@@ -594,41 +603,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         const SizedBox(height: 40),
       ],
-    );
-  }
-
-  Widget _buildFavorites(PlanProvider planProvider) {
-    if (planProvider.favorites.isEmpty) {
-      return const Center(
-        child: Text(
-          'Aún no hay favoritos',
-          style: TextStyle(fontSize: 18, color: Colors.white),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: GridView.builder(
-        itemCount: planProvider.favorites.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.75,
-        ),
-        itemBuilder: (context, index) {
-          final plan = planProvider.favorites[index];
-          return FavoritePlanCard(
-            plan: plan,
-            onBuy: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Agregado al carrito: ${plan.title}')),
-              );
-            },
-          );
-        },
-      ),
     );
   }
 }

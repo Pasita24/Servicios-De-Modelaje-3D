@@ -79,4 +79,67 @@ class EmailService {
       </html>
     ''';
   }
+
+  static Future<void> sendSurveyResults({
+    required String userName,
+    required String userEmail,
+    required Map<String, dynamic> responses,
+  }) async {
+    try {
+      await dotenv.load(fileName: ".env");
+      final adminEmail =
+          dotenv.env['ADMIN_EMAIL'] ?? dotenv.env['EMAIL_USERNAME'];
+
+      if (adminEmail == null) {
+        throw Exception('Correo admin no configurado en .env');
+      }
+
+      final smtpServer = gmail(
+        dotenv.env['EMAIL_USERNAME']!,
+        dotenv.env['EMAIL_PASSWORD']!,
+      );
+
+      final htmlContent = '''
+      <html>
+        <body>
+          <h2>Nueva encuesta recibida - Modelaje 3D</h2>
+          <p><strong>Usuario:</strong> $userName ($userEmail)</p>
+          <h3>Datos demográficos:</h3>
+          <ul>
+            <li><strong>Edad:</strong> ${responses['edad']}</li>
+            <li><strong>Tipo de usuario:</strong> ${responses['tipo_usuario']}</li>
+          </ul>
+          
+          <h3>Evaluación:</h3>
+          <ul>
+            <li><strong>Usabilidad:</strong> ${responses['usabilidad']}/5</li>
+            <li><strong>Modelos 3D:</strong> ${responses['modelos']}/5</li>
+            <li><strong>Visualización AR:</strong> ${responses['ar']}/5</li>
+            <li><strong>Recomendación:</strong> ${responses['recomendacion']}/5</li>
+          </ul>
+          
+          <h3>Comentarios:</h3>
+          <p>${responses['comentarios']?.isNotEmpty == true ? responses['comentarios'] : 'Sin comentarios'}</p>
+          
+          <p>Fecha: ${DateTime.now().toString()}</p>
+        </body>
+      </html>
+    ''';
+
+      final message =
+          Message()
+            ..from = Address(
+              dotenv.env['EMAIL_USERNAME']!,
+              'Encuestas Modelaje 3D',
+            )
+            ..recipients.add(adminEmail)
+            ..subject = 'Encuesta completada por $userName'
+            ..html = htmlContent;
+
+      await send(message, smtpServer);
+    } catch (e) {
+      print('Error enviando encuesta: $e');
+      rethrow;
+    }
+  }
 }

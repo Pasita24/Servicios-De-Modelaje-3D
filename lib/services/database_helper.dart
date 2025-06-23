@@ -18,12 +18,25 @@ class DatabaseHelper {
     return _database!;
   }
 
+  Future<void> updateSurveyCompletion({
+    required String email,
+    required bool completed,
+  }) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'has_completed_survey': completed ? 1 : 0},
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+  }
+
   Future<Database> _initDB(String fileName) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 4, // Incrementar versión por nuevos campos
+      version: 5, // Incrementar versión por nuevos campos
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -37,7 +50,8 @@ class DatabaseHelper {
       password TEXT NOT NULL,
       name TEXT,
       avatarPath TEXT,
-      memberSince TEXT
+      memberSince TEXT,
+      has_completed_survey INTEGER DEFAULT 0
     )
   ''');
     // Insertar personajes predefinidos
@@ -90,6 +104,7 @@ class DatabaseHelper {
     });
   }
 
+  // En el método _upgradeDB, añade la migración:
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 4) {
       try {
@@ -97,8 +112,18 @@ class DatabaseHelper {
         await db.execute('ALTER TABLE users ADD COLUMN avatarPath TEXT');
         await db.execute('ALTER TABLE users ADD COLUMN memberSince TEXT');
       } catch (e) {
-        // Ignorar el error si las columnas ya existen
         print('Algunas columnas ya existían: $e');
+      }
+    }
+
+    if (oldVersion < 5) {
+      // Añade esta nueva condición
+      try {
+        await db.execute(
+          'ALTER TABLE users ADD COLUMN has_completed_survey INTEGER DEFAULT 0',
+        );
+      } catch (e) {
+        print('La columna has_completed_survey ya existía: $e');
       }
     }
   }

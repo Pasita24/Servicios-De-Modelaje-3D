@@ -87,6 +87,13 @@ flutter:
       - assets/images/MedievalImage.jpeg
       - assets/images/LowPolyImage.jpeg
       - assets/images/FotoPerfil.jpeg
+      - assets/images/FotoPerfil2.jpeg
+      - assets/images/FotoPerfil3.jpeg
+      - assets/images/FotoPerfil4.jpeg
+      - assets/images/proceso1.png
+      - assets/images/proceso2.png
+      - assets/images/proceso3.png
+      - assets/images/sniper.png
       - assets/camaraman.glb
       - assets/Anime.glb
       - assets/Boss.glb

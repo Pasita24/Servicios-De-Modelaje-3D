@@ -3,7 +3,6 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:servicios_de_modelaje3d/services/auth_provider.dart';
 import 'package:servicios_de_modelaje3d/services/email_service.dart';
-import 'dart:convert'; // Para jsonEncode si lo necesitas
 
 class CharacterBuilderPage extends StatefulWidget {
   const CharacterBuilderPage({super.key});
@@ -113,10 +112,6 @@ class _CharacterBuilderPageState extends State<CharacterBuilderPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF3A3C3D),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3A3C3D),
-        title: const Text('Constructor de Personajes 3D'),
-      ),
       body: Stack(
         children: [
           // Fondo dinámico con efecto de opacidad

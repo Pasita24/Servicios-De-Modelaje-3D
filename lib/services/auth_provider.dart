@@ -20,6 +20,8 @@ class AuthProvider with ChangeNotifier {
     final name = _prefs.getString('user_name');
     final avatarPath = _prefs.getString('user_avatar');
     final memberSince = _prefs.getString('user_member_since');
+    final hasCompletedSurvey =
+        _prefs.getBool('has_completed_survey') ?? false; // Nuevo
 
     if (email != null) {
       _user = User(
@@ -28,6 +30,7 @@ class AuthProvider with ChangeNotifier {
         name: name,
         avatarPath: avatarPath,
         memberSince: memberSince != null ? DateTime.parse(memberSince) : null,
+        hasCompletedSurvey: hasCompletedSurvey,
       );
       notifyListeners();
     }
@@ -51,6 +54,10 @@ class AuthProvider with ChangeNotifier {
     } else {
       await _prefs.remove('user_avatar');
     }
+    await _prefs.setBool(
+      'has_completed_survey',
+      user.hasCompletedSurvey,
+    ); // Nuevo
     notifyListeners();
   }
 
@@ -85,6 +92,24 @@ class AuthProvider with ChangeNotifier {
     } else {
       throw Exception('Error al registrar el usuario');
     }
+  }
+
+  Future<void> updateSurveyCompletion(bool completed) async {
+    if (_user == null) return;
+
+    final updatedUser = _user!.copyWith(hasCompletedSurvey: completed);
+
+    // Actualizar en SharedPreferences
+    await _prefs.setBool('has_completed_survey', completed);
+
+    // Actualizar en SQLite
+    await DatabaseHelper.instance.updateSurveyCompletion(
+      email: updatedUser.email,
+      completed: completed,
+    );
+
+    _user = updatedUser;
+    notifyListeners();
   }
 
   Future<void> updateProfile({String? name, String? avatarPath}) async {

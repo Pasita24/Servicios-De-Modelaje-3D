@@ -1,4 +1,3 @@
-// user.dart
 class User {
   final int? id;
   final String email;
@@ -6,6 +5,7 @@ class User {
   final String? name;
   final String? avatarPath;
   final DateTime? memberSince;
+  final bool hasCompletedSurvey; // Nuevo campo
 
   User({
     this.id,
@@ -14,6 +14,7 @@ class User {
     this.name,
     this.avatarPath,
     this.memberSince,
+    this.hasCompletedSurvey = false, // Valor por defecto
   });
 
   Map<String, dynamic> toMap() {
@@ -24,6 +25,7 @@ class User {
       'name': name,
       'avatarPath': avatarPath,
       'memberSince': memberSince?.toIso8601String(),
+      'hasCompletedSurvey': hasCompletedSurvey ? 1 : 0, // Guardar como entero
     };
   }
 
@@ -38,6 +40,8 @@ class User {
           map['memberSince'] != null
               ? DateTime.parse(map['memberSince'] as String)
               : null,
+      hasCompletedSurvey:
+          (map['hasCompletedSurvey'] as int?) == 1, // Convertir a bool
     );
   }
 
@@ -48,6 +52,7 @@ class User {
     String? name,
     String? avatarPath,
     DateTime? memberSince,
+    bool? hasCompletedSurvey,
   }) {
     return User(
       id: id ?? this.id,
@@ -56,6 +61,7 @@ class User {
       name: name ?? this.name,
       avatarPath: avatarPath ?? this.avatarPath,
       memberSince: memberSince ?? this.memberSince,
+      hasCompletedSurvey: hasCompletedSurvey ?? this.hasCompletedSurvey,
     );
   }
 }
