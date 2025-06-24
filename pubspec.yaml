@@ -106,6 +106,18 @@ flutter:
       - assets/Shooter.glb
       - assets/model1.glb
       - assets/icons/Logo.png # Agrega el archivo de ícono aquí
+      - assets/screenshots/about_screen.png
+      - assets/screenshots/ar_interaction.png
+      - assets/screenshots/ar_viewer.png
+      - assets/screenshots/database_crud.png
+      - assets/screenshots/encuesta_screen.png
+      - assets/screenshots/form_email.png
+      - assets/screenshots/form.png
+      - assets/screenshots/home_screen.png
+      - assets/screenshots/login_screen.png
+      - assets/screenshots/preference_screen.png
+      - assets/screenshots/profile_screen.png
+      
 android_12:
     # The image parameter sets the splash screen icon image.  If this parameter is not specified,
     # the app's launcher icon will be used instead.
