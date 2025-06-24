@@ -85,7 +85,7 @@
 ## Capturas de Pantalla
 
 ### Pantalla de Inicio y Autenticación
-![Login Screen](screenshots/login_screen.png)
+![Login Screen](assets/screenshots/login_screen.png)
 *Pantalla de inicio de sesión con validación de credenciales*
 
 ![Home Screen](screenshots/home_screen.png)
