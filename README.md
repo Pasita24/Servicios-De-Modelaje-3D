@@ -146,7 +146,7 @@ Se utilizó una encuesta estructurada con 9 preguntas distribuidas en 3 categor�
 ## Descargas
 
 ### 📱 **Archivo APK**
-**[Descargar 3D Character Forge APK](./releases/app_release.apk)**
+**[Descargar 3D Character Forge APK](./build/app/outputs/apk/release/app-release.apk)**
 
 *Versión: 1.0.0 | Tamaño: ~45 MB | Compatible con Android 7.0+*
 
