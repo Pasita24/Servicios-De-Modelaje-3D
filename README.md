@@ -146,7 +146,7 @@ Se utilizó una encuesta estructurada con 9 preguntas distribuidas en 3 categor�
 ## Descargas
 
 ### 📱 **Archivo APK**
-**[Descargar APK](https://github.com/tu_usuario/tu_repositorio/raw/main/releases/app-release.apk)**
+**[Descargar APK](https://github.com/Pasita24/Servicios-De-Modelaje-3D/raw/main/releases/app-release.apk)**
 
 *Versión: 1.0.0 | Tamaño: ~45 MB | Compatible con Android 7.0+*
 
