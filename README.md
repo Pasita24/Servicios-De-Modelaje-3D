@@ -102,7 +102,7 @@
 ![Profile Screen](assets/screenshots/profile_screen.png)
 *Pantalla de perfil de usuario con opciones de edición*
 
-![Preferences Screen](assets/screenshots/preferences_screen.png)
+![Preferences Screen](assets/screenshots/preference_screen.png)
 *Configuración de preferencias personalizadas*
 
 ### Realidad Aumentada
@@ -148,12 +148,10 @@ Se utilizó una encuesta estructurada con 9 preguntas distribuidas en 3 categor�
 ### 📱 **Archivo APK**
 **[Descargar APK](https://github.com/Pasita24/Servicios-De-Modelaje-3D/raw/main/releases/app-release.apk)**
 
-*Versión: 1.0.0 | Tamaño: ~45 MB | Compatible con Android 7.0+*
+*Versión: 1.0.0 | Tamaño: ~97 MB | Compatible con Android 7.0+*
 
 ### 🎥 **Video Explicativo**
-**[Ver Video de Demostración]**
-
-*Duración: 5 minutos | Incluye demo completo de funcionalidades*
+**[(https://youtu.be/We915UnioG4)]**
 
 ## Información del Desarrollador
 
