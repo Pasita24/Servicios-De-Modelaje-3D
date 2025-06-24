@@ -88,39 +88,39 @@
 ![Login Screen](assets/screenshots/login_screen.png)
 *Pantalla de inicio de sesión con validación de credenciales*
 
-![Home Screen](screenshots/home_screen.png)
+![Home Screen](assets/screenshots/home_screen.png)
 *Pantalla principal con navegación a funcionalidades principales*
 
 ### Sistema de Cotización
-![Quote Form](screenshots/form.png)
+![Quote Form](assets/screenshots/form.png)
 *Formulario de solicitud de cotización personalizada*
 
-![Quote Email](screenshots/form_email.png)
+![Quote Email](assets/screenshots/form_email.png)
 *Ejemplo de cotización enviada por correo electrónico*
 
 ### Gestión de Perfil
-![Profile Screen](screenshots/profile_screen.png)
+![Profile Screen](assets/screenshots/profile_screen.png)
 *Pantalla de perfil de usuario con opciones de edición*
 
-![Preferences Screen](screenshots/preferences_screen.png)
+![Preferences Screen](assets/screenshots/preferences_screen.png)
 *Configuración de preferencias personalizadas*
 
 ### Realidad Aumentada
-![AR Viewer](screenshots/ar_viewer.png)
+![AR Viewer](assets/screenshots/ar_viewer.png)
 *Visualización de modelo 3D en realidad aumentada*
 
-![AR Interaction](screenshots/ar_interaction.png)
+![AR Interaction](assets/screenshots/ar_interaction.png)
 *Interacción con modelo 3D en entorno real*
 
 ### Base de Datos y CRUD
-![Database Operations](screenshots/database_crud.png)
+![Database Operations](assets/screenshots/database_crud.png)
 *Operaciones de base de datos en funcionamiento*
 
 ### Sistema de Valoración
-![Survey Screen](screenshots/encuesta_screen.png)
+![Survey Screen](assets/screenshots/encuesta_screen.png)
 *Encuesta de valoración cargada desde JSON*
 
-![About Screen](screenshots/about_screen.png)
+![About Screen](assets/screenshots/about_screen.png)
 *Pantalla "Acerca de" con información del desarrollador*
 
 ## Validación de Usuarios
